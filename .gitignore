@@ -1,0 +1,44 @@
+# Gradle
+.gradle/
+build/
+**/build/
+local.properties
+.gradle/
+captures/
+
+# IntelliJ / Android Studio
+.idea/caches/
+.idea/libraries/
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+.idea/compiler.xml
+.idea/jarRepositories.xml
+.idea/androidProfilers.xml
+
+# Keystore files (IMPORTANT)
+*.jks
+*.keystore
+
+# Signing / secrets
+# google-services.json
+*.pem
+
+# Logs
+*.log
+
+# Android generated files
+*.apk
+*.ap_
+outputs/
+
+# Artifacts
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Kotlin
+kotlin/daemon/
