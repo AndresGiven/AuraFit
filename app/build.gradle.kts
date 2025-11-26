@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material3.lint)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -74,4 +75,13 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
 
     implementation("com.google.firebase:firebase-firestore-ktx:25.1.4")
+
+    // 2. Material 3 (For TextFields, Buttons, and Design System)
+    implementation("androidx.compose.material3:material3")
+
+// 4. Material Icons (Needed for Icons.Filled.Email, Icons.Filled.Lock, etc.)
+    implementation("androidx.compose.material:material-icons-extended")
+
+// 5. Coil (For AsyncImage to load the placeholder logo URL)
+    implementation("io.coil-kt:coil-compose:2.4.0")
 }

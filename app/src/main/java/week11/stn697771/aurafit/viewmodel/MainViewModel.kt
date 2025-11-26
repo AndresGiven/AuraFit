@@ -96,7 +96,7 @@ class MainViewModel : ViewModel() {
     }
 
 // Provides a way for the UI to clear any displayed error messages once they have been shown to the user.
-    fun clearMessage() {
-        _message.value = null
+    fun changeUIState(state: UiState) {
+        _uiState.value = state
     }
 }
