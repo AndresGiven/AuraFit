@@ -4,5 +4,6 @@ package week11.stn697771.aurafit.util
 sealed class UiState {
     object Loading : UiState()
     object AuthRequired : UiState()
+    object AuthSetup : UiState()
     object Authenticated : UiState()
 }
