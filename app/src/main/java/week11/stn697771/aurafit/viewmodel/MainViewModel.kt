@@ -52,6 +52,11 @@ class MainViewModel : ViewModel() {
 
     // login Firebase function
     fun login(email: String, password: String) {
+        //Passwords got to be 6 characters at least
+        if (password.length < 6) {
+            _message.value = "Password must be at least 6 characters."
+            return
+        }
         auth.signInWithEmailAndPassword(email, password)
             .addOnSuccessListener { _uiState.value = UiState.Authenticated }
             .addOnFailureListener { e ->
@@ -62,6 +67,11 @@ class MainViewModel : ViewModel() {
 
     // signUp Firebase function
     fun signUp(email: String, password: String) {
+        //Passwords got to be 6 characters at least
+        if (password.length < 6) {
+            _message.value = "Password must be at least 6 characters."
+            return
+        }
         auth.createUserWithEmailAndPassword(email, password)
             .addOnSuccessListener { _uiState.value = UiState.Authenticated }
             .addOnFailureListener { e ->
@@ -74,6 +84,30 @@ class MainViewModel : ViewModel() {
     fun logout() {
         auth.signOut()
         _uiState.value = UiState.AuthRequired
+    }
+
+
+     //Triggers Firebase to send a password reset email to the specified address.
+     // This is a secure, standard, and free Firebase feature.
+    fun sendPasswordReset(email: String) {
+        _uiState.value = UiState.Loading
+
+        if (email.isBlank()) {
+            _message.value = "Email address cannot be empty."
+            _uiState.value = UiState.AuthForgot
+            return
+        }
+
+        auth.sendPasswordResetEmail(email)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    _message.value = "Password reset link sent to your email."
+                } else {
+                    _message.value = task.exception?.localizedMessage ?: "An unknown error occurred."
+                }
+                // Whether it succeeds or fails, always navigate back to the login screen afterwards
+                _uiState.value = UiState.AuthRequired
+            }
     }
 
     // observe TodoList content

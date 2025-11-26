@@ -5,5 +5,8 @@ sealed class UiState {
     object Loading : UiState()
     object AuthRequired : UiState()
     object AuthSetup : UiState()
+
+    object AuthForgot : UiState()
     object Authenticated : UiState()
+
 }

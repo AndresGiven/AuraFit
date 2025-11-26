@@ -20,7 +20,13 @@ private val DarkColorScheme = darkColorScheme(
 private val LightColorScheme = lightColorScheme(
     primary = Purple40,
     secondary = PurpleGrey40,
-    tertiary = Pink40
+    tertiary = Pink40,
+    background = White,
+    surface = White,
+    onPrimary = White,
+    onBackground = TextBlack,
+    onSurface = TextBlack,
+    outline = OutlineColor
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -52,7 +58,7 @@ fun AuraFitTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = AppTypography,
         content = content
     )
 }
