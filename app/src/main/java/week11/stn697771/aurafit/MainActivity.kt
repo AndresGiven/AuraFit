@@ -92,12 +92,11 @@ class MainActivity : ComponentActivity() {
             AuraFitTheme {
                 val vm: MainViewModel = viewModel()
                 val uiState by vm.uiState.collectAsState()
-                val todos by vm.todos.collectAsState()
 
                 when (uiState) {
                     UiState.Loading -> Text("Loading...")
                     UiState.AuthRequired -> LoginScreen(vm)
-                    UiState.Authenticated -> Pedometer(vm, todos)
+                    UiState.Authenticated -> Pedometer(vm)
                     UiState.AuthSetup -> SignUpScreen(vm)
                     UiState.AuthForgot -> PasswordScreen(vm)
                 }
