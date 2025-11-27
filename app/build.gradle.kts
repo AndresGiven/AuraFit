@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -60,4 +62,27 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    // for ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6")
+
+
+
+    // Import the Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:34.3.0"))
+
+    // Add the dependency for the Firebase Authentication library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation("com.google.firebase:firebase-auth")
+
+    implementation("com.google.firebase:firebase-firestore-ktx:25.1.4")
+
+    // 2. Material 3 (For TextFields, Buttons, and Design System)
+    implementation("androidx.compose.material3:material3")
+
+// 4. Material Icons (Needed for Icons.Filled.Email, Icons.Filled.Lock, etc.)
+    implementation("androidx.compose.material:material-icons-extended")
+
+// 5. Coil (For AsyncImage to load the placeholder logo URL)
+    implementation("io.coil-kt:coil-compose:2.4.0")
 }
