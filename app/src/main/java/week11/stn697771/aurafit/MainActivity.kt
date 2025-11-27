@@ -20,11 +20,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.automirrored.filled.ShowChart
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddAlarm
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
@@ -69,14 +71,18 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.lifecycle.viewmodel.compose.viewModel
 import week11.stn697771.aurafit.model.TodoItem
 import week11.stn697771.aurafit.ui.theme.AuraFitTheme
+import week11.stn697771.aurafit.ui.theme.LocalNutrientColors
 import week11.stn697771.aurafit.util.UiState
 import week11.stn697771.aurafit.viewmodel.MainViewModel
 
@@ -569,28 +575,43 @@ fun PasswordForm(vm: MainViewModel, modifier: Modifier = Modifier) {
 
 @Composable
 fun Pedometer(vm: MainViewModel, todos: List<TodoItem>) {
-    val DarkThemeColor = Color(0xFF1B212A)
     Column(
         Modifier
             .fillMaxSize()
-            .background(DarkThemeColor),
+            .background(MaterialTheme.colorScheme.background)
+            .padding(horizontal = 18.dp),
         horizontalAlignment = Alignment.CenterHorizontally){
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = "Aura Fit",
-            fontSize = 34.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White
-        )
         Spacer(modifier = Modifier.height(20.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(35.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+
+        ){
+            Image(
+                painter = painterResource(id = R.drawable.thickemptylogo),
+                contentScale = ContentScale.Inside,
+                contentDescription = "Logo",
+            )
+            Text(
+                text = "AuraFit",
+                fontSize = 25.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
         TopMeasurementBar()
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(36.dp))
         CutCircularPedometer(progress = 1f)
         Spacer(modifier = Modifier.height(16.dp))
         ProgressBar()
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(16.dp))
         BottomNavBar()
-
+        Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = { vm.logout() }) {
             Text("Logout")
         }
@@ -645,26 +666,34 @@ fun CutCircularPedometer(
     steps: Int = 6543,
     goal: Int = 10000
 ) {
+    val auraPrimary = MaterialTheme.colorScheme.primary
+    val colors = LocalNutrientColors.current
     val gradientColors = listOf(
-        Color(0xFF6A00FF),
-        Color(0xFFE91E63),
-        Color(0xFFFF9800),
-        Color(0xFFFFEB3B)
+        Color(0xFF55FE2A),
+        Color(0xFF10C5DE),
+        Color(0xFF4638F2),
+        Color(0xFF4638F2),
+        Color(0xFFAD20B4),
+        Color(0xFFED1D5E),
+        Color(0xFFFD8D02),
+        Color(0xFFD6CC08),
+        Color(0xFF55FE2A),
     )
 
     val totalSweep = 260f
-    val startAngle = -220f
+    val startAngle = 140f
     val progressSweep = progress * totalSweep
+    val progressSweepTEMP = progressSweep - 90f
 
     Box(
-        modifier = modifier.size(250.dp), //change this for outer ring
+        modifier = modifier.size(310.dp), //change this for outer ring
         contentAlignment = Alignment.Center
     ) {
         Canvas(Modifier.fillMaxSize()) {
-            val strokeWidth = 22.dp.toPx()
+            val strokeWidth = 36.dp.toPx()
 
             drawArc(
-                color = Color(0xFFBDBDBD),
+                color = colors.emptyProgress,
                 startAngle = startAngle,
                 sweepAngle = totalSweep,
                 useCenter = false,
@@ -674,32 +703,33 @@ fun CutCircularPedometer(
             drawArc(
                 brush = Brush.sweepGradient(gradientColors),
                 startAngle = startAngle,
-                sweepAngle = progressSweep,
+                sweepAngle = progressSweepTEMP,
                 useCenter = false,
                 style = Stroke(strokeWidth, cap = StrokeCap.Round)
             )
         }
         Canvas(
             modifier = Modifier
-                .size(210.dp) //change this for inner ring
+                .size(255.dp) //change this for inner CIRCLE
                 .align(Alignment.Center)
         ) {
             drawCircle(
-                color = Color(0xFF2C3440),
+                color = auraPrimary,
                 radius = size.minDimension / 2
             )
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = "%,d".format(steps),
-                fontSize = 34.sp,
-                fontWeight = FontWeight.Bold,
+                fontSize = 46.sp,
+                fontWeight = FontWeight.ExtraBold,
                 color = Color.White
             )
             Text(
                 text = "Goal: ${"%,d".format(goal)}",
-                fontSize = 16.sp,
-                color = Color.LightGray
+                fontSize = 20.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.tertiary
             )
         }
         Column(
@@ -708,7 +738,6 @@ fun CutCircularPedometer(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom
         ) {
-            Spacer(Modifier.size(12.dp))
 
             CircularButton {
                 // adding on click code later
@@ -720,10 +749,10 @@ fun CutCircularPedometer(
 @Composable
 fun TopMeasurementBar() {
     Row(
-        modifier = Modifier.fillMaxWidth(0.8f)
+        modifier = Modifier.fillMaxWidth()
             .clip(RoundedCornerShape(50.dp))
-            .background(Color(0xFF2C3440))
-            .padding(vertical = 10.dp),
+            .background(MaterialTheme.colorScheme.primary)
+            .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -738,7 +767,7 @@ fun TopMeasurementBar() {
                 tint = Color.White
             )
             Text(
-                text = "330 k cal",
+                text = "330 kcal",
                 fontSize = 16.sp,
                 color = Color.White
             )
@@ -781,189 +810,100 @@ fun TopMeasurementBar() {
 
 @Composable
 fun ProgressBar() {
+    val colors = LocalNutrientColors.current
     Column(
         modifier = Modifier
-            .fillMaxWidth(0.9f)
-            .clip(RoundedCornerShape(50.dp))
-            .background(Color(0xFF2C3440))
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(32.dp))
+            .background(MaterialTheme.colorScheme.primary)
+            .padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-        Column(
-            modifier = Modifier.fillMaxWidth(0.85f),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Colored progress bar on top
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(12.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(Color.Gray)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(59f / 90f)
-                        .fillMaxHeight()
-                        .background(Color(0xFFFFC107))
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Text(
-                    text = "Protein 59g / 90g",
-                    fontSize = 16.sp,
-                    color = Color.White
-                )
-                Icon(
-                    imageVector = Icons.Filled.Edit,
-                    contentDescription = "Edit",
-                    tint = Color.White
-                )
-            }
-        }
-
-        Column(
-            modifier = Modifier.fillMaxWidth(0.85f),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(12.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(Color.Gray)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(163f / 310f)
-                        .fillMaxHeight()
-                        .background(Color(0xFFFFC107))
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Text(
-                    text = "Carbs 163g / 310g",
-                    fontSize = 16.sp,
-                    color = Color.White
-                )
-                Icon(
-                    imageVector = Icons.Filled.Edit,
-                    contentDescription = "Edit",
-                    tint = Color.White
-                )
-            }
-        }
-
-        Column(
-            modifier = Modifier.fillMaxWidth(0.85f),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(12.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(Color.Gray)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(55f / 70f)
-                        .fillMaxHeight()
-                        .background(Color(0xFFFFC107))
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Text(
-                    text = "Fat 55g / 70g",
-                    fontSize = 16.sp,
-                    color = Color.White
-                )
-                Icon(
-                    imageVector = Icons.Filled.Edit,
-                    contentDescription = "Edit",
-                    tint = Color.White
-                )
-            }
-        }
-
-        Column(
-            modifier = Modifier.fillMaxWidth(0.85f),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(12.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(Color.Gray)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(1213f / 1800f)
-                        .fillMaxHeight()
-                        .background(Color(0xFFFFC107))
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Text(
-                    text = "Cals 1213 / 1800",
-                    fontSize = 16.sp,
-                    color = Color.White
-                )
-                Icon(
-                    imageVector = Icons.Filled.Edit,
-                    contentDescription = "Edit",
-                    tint = Color.White
-                )
-            }
-        }
-
+        NutritionProgressItem("Protein", 59f, 90f, "g",colors.protein)
+        NutritionProgressItem("Carbs", 163f, 310f, "g", colors.carb)
+        NutritionProgressItem("Fat", 55f, 70f, "g",colors.fat)
+        NutritionProgressItem("Cals", 1213f, 1800f, "",colors.cal)
     }
 }
+
+@Composable
+fun NutritionProgressItem(
+    label: String,
+    value: Float,
+    goal: Float,
+    unit: String = "g",
+    color: Color = Color(0xFFFFC107)
+) {
+    val colors = LocalNutrientColors.current
+    val progress = (value / goal).coerceIn(0f, 1f)
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+
+        // Progress Bar
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(24.dp)
+                .clip(RoundedCornerShape(13.dp))
+                .background(colors.emptyProgress)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(progress)
+                    .fillMaxHeight()
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(color)
+            )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = label,
+                fontWeight = FontWeight.ExtraBold,
+                color = Color.White,
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                text = "${value.toInt()}$unit / ${goal.toInt()}$unit",
+                fontWeight = FontWeight.ExtraBold,
+                color = Color.White,
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Center
+            )
+            Icon(
+                Icons.Filled.Edit,
+                contentDescription = "Edit",
+                tint = Color.White,
+                modifier = Modifier.weight(1f).wrapContentWidth(Alignment.End)
+            )
+        }
+    }
+}
+
 
 
 @Composable
 fun CircularButton(
     onClick: () -> Unit,
     ) {
-    var pausePlay by remember { mutableStateOf(false) } // State to track if music is playing
+    val colors = LocalNutrientColors.current
+    var pausePlay by remember { mutableStateOf(false) } // State to track if steps are tracked
+
     IconButton(
         onClick = { pausePlay = !pausePlay },
         colors = IconButtonDefaults.iconButtonColors(
-            containerColor = Color(0xFF0000FF ),
+            containerColor = colors.protein,
             contentColor = Color.White
         ),
-        modifier = Modifier.size(68.dp),
+        modifier = Modifier.size(82.dp),
 
     ) {
         Icon(
-            modifier = Modifier.size(40.dp),
+            modifier = Modifier.size(58.dp),
             imageVector = if (pausePlay) Icons.Filled.Pause else Icons.Filled.PlayArrow,
             contentDescription = "Basically swaps from pause to play with a click",
         )
@@ -983,7 +923,8 @@ fun BottomNavButton(
         Icon(
             imageVector = icon,
             contentDescription = contentDescription,
-            tint = Color.White
+            tint = Color.White,
+            modifier = Modifier.size(32.dp)
         )
     }
 }
@@ -991,9 +932,12 @@ fun BottomNavButton(
 @Composable
 fun BottomNavBar(){
     Row(
-        modifier = Modifier.fillMaxWidth(0.9f)
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .padding(vertical = 4.dp)
             .clip(RoundedCornerShape(50.dp))
-            .background(Color(0xFF2C3440)),
+            .background(MaterialTheme.colorScheme.primary),
         horizontalArrangement = Arrangement.SpaceEvenly
 
     ) {
@@ -1005,12 +949,12 @@ fun BottomNavBar(){
 
         BottomNavButton(
             icon = Icons.AutoMirrored.Filled.ShowChart,
-            contentDescription = "Graph ",
+            contentDescription = "Graph",
             onClick = { }
         )
 
         BottomNavButton(
-            icon = Icons.Default.AddAlarm,
+            icon = Icons.Default.Add,
             contentDescription = "Add button",
             onClick = {  }
         )

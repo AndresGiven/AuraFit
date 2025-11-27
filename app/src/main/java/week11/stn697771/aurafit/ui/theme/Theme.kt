@@ -77,7 +77,9 @@ fun AuraFitTheme(
         fatLightest = FatLightest,
         cal = Cal,
         calLight = CalLight,
-        calLightest = CalLightest
+        calLightest = CalLightest,
+        emptyProgress = EmptyProgress,
+        disabled = Disabled
     )
 
     CompositionLocalProvider(
