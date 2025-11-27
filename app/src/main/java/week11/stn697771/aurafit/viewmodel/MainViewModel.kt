@@ -3,11 +3,13 @@ package week11.stn697771.aurafit.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import week11.stn697771.aurafit.util.UiState
 import week11.stn697771.aurafit.data.UserRepo
+import week11.stn697771.aurafit.util.NavEvent
 
 /*
 The MainViewModel serves as the central hub for UI-related logic and state management for the main screens
@@ -24,6 +26,10 @@ class MainViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState
 
+    private val _navEvents = MutableSharedFlow<NavEvent>()
+    val navEvents: MutableSharedFlow<NavEvent> = _navEvents
+
+
     // Error message (for Snackbar)
     // Provides a mechanism to display transient messages or errors to the user (e.g., in a Snackbar).
     private val _message = MutableStateFlow<String?>(null)
@@ -31,13 +37,15 @@ class MainViewModel : ViewModel() {
 
     init {
         // Observe FirebaseAuth state
-        // Sets up an addAuthStateListener to automatically update the _uiState when the user's authentication status changes (login, logout). When a user logs in, it also triggers the observation of their to-do list.
+        // Sets up an addAuthStateListener to automatically update the _uiState when the user's authentication status changes (login, logout).
         auth.addAuthStateListener { firebaseAuth ->
             val user = firebaseAuth.currentUser
             if (user == null) {
-                _uiState.value = UiState.AuthRequired
+                _uiState.value = UiState.Unauthenticated
+                sendEvent(NavEvent.ToLogin)
             } else {
                 _uiState.value = UiState.Authenticated
+                sendEvent(NavEvent.ToPedometer)
             }
         }
     }
@@ -50,9 +58,13 @@ class MainViewModel : ViewModel() {
             return
         }
         auth.signInWithEmailAndPassword(email, password)
-            .addOnSuccessListener { _uiState.value = UiState.Authenticated }
+            .addOnSuccessListener {
+                _uiState.value = UiState.Authenticated
+                sendEvent(NavEvent.ToPedometer)
+            }
             .addOnFailureListener { e ->
-                _uiState.value = UiState.AuthRequired
+                _uiState.value = UiState.Unauthenticated
+                sendEvent(NavEvent.ToLogin)
                 _message.value = e.localizedMessage ?: "Login failed"
             }
     }
@@ -65,9 +77,13 @@ class MainViewModel : ViewModel() {
             return
         }
         auth.createUserWithEmailAndPassword(email, password)
-            .addOnSuccessListener { _uiState.value = UiState.AuthRequired }
+            .addOnSuccessListener {
+                _uiState.value = UiState.Unauthenticated
+                sendEvent(NavEvent.ToLogin)
+            }
             .addOnFailureListener { e ->
-                _uiState.value = UiState.AuthRequired
+                _uiState.value = UiState.Unauthenticated
+                sendEvent(NavEvent.ToSignUp)
                 _message.value = e.localizedMessage ?: "Sign up failed"
             }
     }
@@ -75,7 +91,8 @@ class MainViewModel : ViewModel() {
     // logOut Firebase function
     fun logout() {
         auth.signOut()
-        _uiState.value = UiState.AuthRequired
+        _uiState.value = UiState.Unauthenticated
+        sendEvent(NavEvent.ToLogin)
     }
 
 
@@ -86,7 +103,7 @@ class MainViewModel : ViewModel() {
 
         if (email.isBlank()) {
             _message.value = "Email address cannot be empty."
-            _uiState.value = UiState.AuthForgot
+            _uiState.value = UiState.Unauthenticated
             return
         }
 
@@ -98,7 +115,8 @@ class MainViewModel : ViewModel() {
                     _message.value = task.exception?.localizedMessage ?: "An unknown error occurred."
                 }
                 // Whether it succeeds or fails, always navigate back to the login screen afterwards
-                _uiState.value = UiState.AuthRequired
+                _uiState.value = UiState.Unauthenticated
+                sendEvent(NavEvent.ToLogin)
             }
     }
 
@@ -106,4 +124,17 @@ class MainViewModel : ViewModel() {
     fun changeUIState(state: UiState) {
         _uiState.value = state
     }
+
+    //For use inside viewmodel
+    private fun sendEvent(e: NavEvent) {
+        viewModelScope.launch {
+            _navEvents.emit(e)
+        }
+    }
+
+    //Able to be called from outside
+    fun navigate(event: NavEvent) {
+        viewModelScope.launch { sendEvent(event) }
+    }
+
 }

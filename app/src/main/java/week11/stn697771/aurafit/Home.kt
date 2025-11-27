@@ -58,7 +58,6 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import week11.stn697771.aurafit.ui.theme.LocalNutrientColors
-import week11.stn697771.aurafit.viewmodel.BasicAlertDialogSample
 import week11.stn697771.aurafit.viewmodel.MainViewModel
 
 @Composable

@@ -44,6 +44,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import week11.stn697771.aurafit.util.NavEvent
 import week11.stn697771.aurafit.util.UiState
 import week11.stn697771.aurafit.viewmodel.MainViewModel
 
@@ -223,7 +224,7 @@ fun LoginForm(vm: MainViewModel, modifier: Modifier = Modifier) {
                     modifier = Modifier
                         .align(Alignment.CenterStart)
                         .clickable {
-                            vm.changeUIState(UiState.AuthForgot)
+                            vm.navigate(NavEvent.ToForgot)
                         }
                 )
             }
@@ -260,7 +261,7 @@ fun LoginForm(vm: MainViewModel, modifier: Modifier = Modifier) {
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.background,
                     style = MaterialTheme.typography.labelMedium,
-                    modifier = Modifier.clickable { vm.changeUIState(UiState.AuthSetup) }
+                    modifier = Modifier.clickable { vm.navigate(NavEvent.ToSignUp) }
                 )
             }
         }
@@ -414,7 +415,7 @@ fun SignUpForm(vm: MainViewModel, modifier: Modifier = Modifier) {
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.background,
                     style = MaterialTheme.typography.labelMedium,
-                    modifier = Modifier.clickable { vm.changeUIState(UiState.AuthRequired) }
+                    modifier = Modifier.clickable { vm.navigate(NavEvent.ToLogin) }
                 )
             }
         }
@@ -503,7 +504,7 @@ fun PasswordForm(vm: MainViewModel, modifier: Modifier = Modifier) {
                     color = MaterialTheme.colorScheme.background,
                     style = MaterialTheme.typography.labelMedium,
                     modifier = Modifier.clickable {
-                        vm.changeUIState(UiState.AuthRequired)
+                        vm.changeUIState(UiState.Unauthenticated)
                     }
                 )
             }
