@@ -52,7 +52,9 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.material3.lint)
+    implementation("androidx.compose.material:material-icons-extended:1.6.8")
+    implementation("androidx.compose.material3:material3:1.x.x")
+    implementation(libs.androidx.compose.foundation.layout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -60,7 +62,6 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-
 
     // for ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6")
