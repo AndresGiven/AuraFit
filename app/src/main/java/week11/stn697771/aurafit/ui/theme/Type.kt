@@ -12,13 +12,13 @@ val AppTypography = Typography(
     headlineLarge = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.ExtraBold,
-        fontSize = 32.sp
+        fontSize = 36.sp
     ),
     // Style for "Sign in" and "Sign Up" subtitles
     headlineSmall = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 24.sp
+        fontWeight = FontWeight.Light,
+        fontSize = 38.sp
     ),
     // Style for "AURA FIT" logo text
     titleLarge = TextStyle(

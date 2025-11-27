@@ -9,56 +9,84 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
+
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = AuraPrimary,
+    onPrimary = Color.White,
+
+    secondary = AuraSecondary,
+    onSecondary = Color.White,
+
+    tertiary = AuraAccent,
+    onTertiary = Color.White,
+
+    background = AuraBackground,
+    onBackground = Color.White,
+
+    surface = AuraBackground,
+    onSurface = Color.White,
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40,
-    background = White,
-    surface = White,
-    onPrimary = White,
-    onBackground = TextBlack,
-    onSurface = TextBlack,
-    outline = OutlineColor
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
+    primary = AuraPrimary,
     onPrimary = Color.White,
+
+    secondary = AuraSecondary,
     onSecondary = Color.White,
+
+    tertiary = AuraAccent,
     onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+
+    background = AuraBackground,
+    onBackground = Color.White,
+
+    surface = AuraBackground,
+    onSurface = Color.White,
 )
 
 @Composable
 fun AuraFitTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+    val context = LocalContext.current
+
+    val colorScheme =
+        if (dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (darkTheme) dynamicDarkColorScheme(context)
+            else dynamicLightColorScheme(context)
+        } else {
+            if (darkTheme) DarkColorScheme
+            else LightColorScheme
         }
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
-
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = AppTypography,
-        content = content
+    val nutrientColors = NutrientColors(
+        protein = Protein,
+        proteinLight = ProteinLight,
+        proteinLightest = ProteinLightest,
+        carb = Carb,
+        carbLight = CarbLight,
+        carbLightest = CarbLightest,
+        fat = Fat,
+        fatLight = FatLight,
+        fatLightest = FatLightest,
+        cal = Cal,
+        calLight = CalLight,
+        calLightest = CalLightest
     )
+
+    CompositionLocalProvider(
+        LocalNutrientColors provides nutrientColors
+    ) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = AppTypography,
+            content = content
+        )
+    }
 }

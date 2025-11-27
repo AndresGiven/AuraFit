@@ -9,6 +9,7 @@ captures/
 # IntelliJ / Android Studio
 .idea/caches/
 .idea/libraries/
+.idea/inspectionProfiles/
 .idea/modules.xml
 .idea/workspace.xml
 .idea/navEditor.xml
@@ -16,6 +17,7 @@ captures/
 .idea/compiler.xml
 .idea/jarRepositories.xml
 .idea/androidProfilers.xml
+.idea/DeviceManager.xml
 
 # Keystore files (IMPORTANT)
 *.jks
