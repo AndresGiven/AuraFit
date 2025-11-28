@@ -15,14 +15,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
-import androidx.compose.material.icons.automirrored.filled.ShowChart
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Schedule
@@ -31,15 +29,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,35 +43,35 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import week11.stn697771.aurafit.ui.theme.LocalNutrientColors
 import week11.stn697771.aurafit.viewmodel.MainViewModel
 
 @Composable
 fun Pedometer(vm: MainViewModel) {
+    val scrollState = rememberScrollState()
     Column(
-        Modifier
+        modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(scrollState) // <-- makes it scrollable
             .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 18.dp),
-        horizontalAlignment = Alignment.CenterHorizontally){
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Spacer(modifier = Modifier.height(20.dp))
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(35.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
-
-        ){
+        ) {
             Image(
                 painter = painterResource(id = R.drawable.thickemptylogo),
                 contentScale = ContentScale.Inside,
@@ -97,13 +92,14 @@ fun Pedometer(vm: MainViewModel) {
         Spacer(modifier = Modifier.height(16.dp))
         ProgressBars()
         Spacer(modifier = Modifier.height(16.dp))
-        BottomNavBar()
-        Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = { vm.logout() }) {
             Text("Logout")
         }
+
+        Spacer(modifier = Modifier.height(20.dp)) // optional bottom spacing
     }
 }
+
 
 @Composable
 fun TopMeasurementBar() {
@@ -354,101 +350,58 @@ fun NutritionProgressItem(
     }
 }
 
+////Used from https://m3.material.io/components/progress-indicators/overview
+//@Composable
+//fun LinearDeterminateIndicator() {
+//    var currentProgress by remember { mutableFloatStateOf(0f) }
+//    var loading by remember { mutableStateOf(false) }
+//    val scope = rememberCoroutineScope() // Create a coroutine scope
+//
+//    Column(
+//        verticalArrangement = Arrangement.spacedBy(12.dp),
+//        horizontalAlignment = Alignment.CenterHorizontally,
+//        modifier = Modifier.fillMaxWidth()
+//    ) {
+//        Button(onClick = {
+//            loading = true
+//            scope.launch {
+//                loadProgress { progress ->
+//                    currentProgress = progress
+//                }
+//                loading = false // Reset loading when the coroutine finishes
+//            }
+//        }, enabled = !loading) {
+//            Text("Start loading")
+//        }
+//
+//        if (loading) {
+//            LinearProgressIndicator(
+//                progress = { currentProgress },
+//                modifier = Modifier.fillMaxWidth(),
+//            )
+//        }
+//    }
+//}
+//
+///** Iterate the progress value */
+//suspend fun loadProgress(updateProgress: (Float) -> Unit) {
+//    for (i in 1..100) {
+//        updateProgress(i.toFloat() / 100)
+//        delay(100)
+//    }
+//}
+
 @Composable
-fun BottomNavBar(){
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp)
-            .padding(vertical = 4.dp)
-            .clip(RoundedCornerShape(50.dp))
-            .background(MaterialTheme.colorScheme.primary),
-        horizontalArrangement = Arrangement.SpaceEvenly
-
-    ) {
-        BottomNavButton(
-            icon = Icons.Default.Home,
-            contentDescription = "Home",
-            onClick = { }
-        )
-
-        BottomNavButton(
-            icon = Icons.AutoMirrored.Filled.ShowChart,
-            contentDescription = "Graph",
-            onClick = { }
-        )
-
-        BottomNavButton(
-            icon = Icons.Default.Add,
-            contentDescription = "Add button",
-            onClick = {  }
-        )
-        BottomNavButton(
-            icon = Icons.Default.AccountCircle,
-            contentDescription = "Account Icon",
-            onClick = {  }
-        )
-    }
+fun InsightsScreen(vm: MainViewModel){
+    Text("INSIGHTS SCREEN", color = Color.Black)
 }
 
 @Composable
-fun BottomNavButton(
-    icon: ImageVector,
-    contentDescription: String? = null,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    IconButton(
-        onClick = onClick,
-        modifier = modifier
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = contentDescription,
-            tint = Color.White,
-            modifier = Modifier.size(32.dp)
-        )
-    }
+fun AddMealScreen(vm: MainViewModel){
+    Text("ADD MEAL SCREEN", color = Color.Black)
 }
 
-
-//Used from https://m3.material.io/components/progress-indicators/overview
 @Composable
-fun LinearDeterminateIndicator() {
-    var currentProgress by remember { mutableFloatStateOf(0f) }
-    var loading by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope() // Create a coroutine scope
-
-    Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Button(onClick = {
-            loading = true
-            scope.launch {
-                loadProgress { progress ->
-                    currentProgress = progress
-                }
-                loading = false // Reset loading when the coroutine finishes
-            }
-        }, enabled = !loading) {
-            Text("Start loading")
-        }
-
-        if (loading) {
-            LinearProgressIndicator(
-                progress = { currentProgress },
-                modifier = Modifier.fillMaxWidth(),
-            )
-        }
-    }
-}
-
-/** Iterate the progress value */
-suspend fun loadProgress(updateProgress: (Float) -> Unit) {
-    for (i in 1..100) {
-        updateProgress(i.toFloat() / 100)
-        delay(100)
-    }
+fun Profile(vm: MainViewModel){
+    Text("PROFILE SCREEN", color = Color.Black)
 }

@@ -86,4 +86,5 @@ dependencies {
 
 // 5. Coil (For AsyncImage to load the placeholder logo URL)
     implementation("io.coil-kt:coil-compose:2.4.0")
+    implementation("androidx.navigation:navigation-compose:2.9.6")
 }

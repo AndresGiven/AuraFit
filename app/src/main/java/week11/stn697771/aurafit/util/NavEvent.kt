@@ -5,4 +5,9 @@ sealed interface NavEvent {
     object ToSignUp : NavEvent
     object ToForgot : NavEvent
     object ToPedometer : NavEvent
+    object ToInsights : NavEvent
+    object ToAddMeal : NavEvent
+    object ToProfile : NavEvent
+    data class NavigateTo(val route: String) : NavEvent
+
 }
