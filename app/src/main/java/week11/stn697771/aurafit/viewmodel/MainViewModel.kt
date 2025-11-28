@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import week11.stn697771.aurafit.util.UiState
 import week11.stn697771.aurafit.data.UserRepo
+import week11.stn697771.aurafit.model.Meal
 import week11.stn697771.aurafit.util.NavEvent
 
 /*
@@ -118,6 +119,12 @@ class MainViewModel : ViewModel() {
                 _uiState.value = UiState.Unauthenticated
                 sendEvent(NavEvent.ToLogin)
             }
+    }
+
+    fun saveMeal(meal: Meal){
+        viewModelScope.launch {
+            repo.addMealItem(meal)
+        }
     }
 
 // Provides a way for the UI to clear any displayed error messages once they have been shown to the user.

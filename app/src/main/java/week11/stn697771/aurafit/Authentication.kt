@@ -300,8 +300,7 @@ fun SignUpForm(vm: MainViewModel, modifier: Modifier = Modifier) {
                     .padding(start = 80.dp, bottom = 10.dp),
                 thickness = 2.dp,
                 color = MaterialTheme.colorScheme.background,
-
-                )
+            )
         }
 
         Column(

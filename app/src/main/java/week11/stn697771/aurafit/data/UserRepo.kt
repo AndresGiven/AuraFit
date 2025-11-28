@@ -2,10 +2,8 @@ package week11.stn697771.aurafit.data
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import week11.stn697771.aurafit.model.Meal
 
 /*
 The UserRepo class is responsible for handling all interactions with Firebase
@@ -18,5 +16,21 @@ class UserRepo {
 
     // get instance of Firestore
     private val db = FirebaseFirestore.getInstance()
+
+    suspend fun addMealItem(item: Meal) {
+        // It retrieves the currently authenticated user. If no user is logged in, it returns
+        val user = auth.currentUser ?: return
+
+        // It creates a copy of the TodoItem and populates the userEmail field with the current user's email
+        val itemWithEmail = item.copy(userEmail = user.email)
+        // it stores the item in a specific path in Firestore: users/{user.uid}/todos/.
+        db.collection("users")
+            .document(user.uid)
+            .collection("meals")
+            .add(itemWithEmail)
+            // It uses await() from kotlinx.coroutines.tasks to make the Firestore add operation a suspending function,
+            // allowing for asynchronous handling
+            .await()
+    }
 }
 

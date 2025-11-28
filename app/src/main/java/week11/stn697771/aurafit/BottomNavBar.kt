@@ -22,6 +22,9 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -54,6 +57,10 @@ fun BottomNavigationBar(
     currentRoute: String?,
     vm: MainViewModel,
 ) {
+    var showDialog by remember { mutableStateOf(false) }
+    var textInput by remember { mutableStateOf("") }
+
+
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.primary,
         modifier = Modifier.clip(RoundedCornerShape(100.dp)),
@@ -68,12 +75,24 @@ fun BottomNavigationBar(
                     indicatorColor = MaterialTheme.colorScheme.tertiary
                 ),
                 onClick = {
-                    if (currentRoute != screen.route) {
+                    if(screen.route == "addMeal"){
+                        showDialog = true
+                    }
+                    else if (currentRoute != screen.route) {
                         vm.navigate(NavEvent.NavigateTo(screen.route))
                     }
                 }
             )
         }
+    }
+
+    if (showDialog) {
+        AddMeal(
+            textInput = textInput,
+            onTextChange = { textInput = it },
+            onDismiss = { showDialog = false },
+            vm = vm
+        )
     }
 }
 
