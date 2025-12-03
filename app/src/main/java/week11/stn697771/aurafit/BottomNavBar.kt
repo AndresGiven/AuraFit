@@ -22,6 +22,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -32,14 +33,15 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import week11.stn697771.aurafit.data.NutritionGuess
 import week11.stn697771.aurafit.util.NavEvent
 import week11.stn697771.aurafit.viewmodel.MainViewModel
 
 
 sealed class BottomNavScreen(val route: String, val icon: ImageVector, val label: String) {
     object Home : BottomNavScreen("pedometer", Icons.Default.Home, "Home")
-    object Insights : BottomNavScreen("insights", Icons.AutoMirrored.Filled.ShowChart, "Graph")
-    object AddMeal : BottomNavScreen("addMeal", Icons.Default.Add, "AddMeal")
+    object Insights : BottomNavScreen("insights", Icons.AutoMirrored.Filled.ShowChart, "Insights")
+    object AddMeal : BottomNavScreen("addMeal", Icons.Default.Add, "Add Meal")
     object Profile : BottomNavScreen("profile", Icons.Default.AccountCircle, "Profile")
 }
 
@@ -59,15 +61,18 @@ fun BottomNavigationBar(
 ) {
     var showDialog by remember { mutableStateOf(false) }
     var textInput by remember { mutableStateOf("") }
-
+    var step by remember { mutableIntStateOf(1) }
 
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.clip(RoundedCornerShape(100.dp)),
+        modifier = Modifier
+            .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+            .clip(RoundedCornerShape(100.dp))
     ) {
         items.forEach { screen ->
             NavigationBarItem(
                 icon = { Icon(screen.icon, contentDescription = screen.label, modifier = Modifier.size(32.dp)) },
+                label = { Text(screen.label) },
                 selected = currentRoute == screen.route,
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = Color.White,
@@ -77,6 +82,8 @@ fun BottomNavigationBar(
                 onClick = {
                     if(screen.route == "addMeal"){
                         showDialog = true
+                        step = 1
+                        //vm.guessNutrition("Alfredo")
                     }
                     else if (currentRoute != screen.route) {
                         vm.navigate(NavEvent.NavigateTo(screen.route))
@@ -87,12 +94,19 @@ fun BottomNavigationBar(
     }
 
     if (showDialog) {
-        AddMeal(
-            textInput = textInput,
-            onTextChange = { textInput = it },
-            onDismiss = { showDialog = false },
-            vm = vm
-        )
+        when (step){
+            1 -> AddMeal(
+                textInput = textInput,
+                onTextChange = { textInput = it },
+                onDismiss = { showDialog = false },
+                vm = vm,
+                step = { step = 2},
+            )
+            2 -> MacrosDialog(
+                vm,
+                onDismiss = { showDialog = false },
+            )
+        }
     }
 }
 

@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -20,6 +22,14 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val spoonacularKey: String = gradleLocalProperties(rootDir, providers).getProperty("SPOONACULAR_KEY")
+
+        buildConfigField("String", "SPOONACULAR_KEY", "\"$spoonacularKey\"")
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {
@@ -87,4 +97,8 @@ dependencies {
 // 5. Coil (For AsyncImage to load the placeholder logo URL)
     implementation("io.coil-kt:coil-compose:2.4.0")
     implementation("androidx.navigation:navigation-compose:2.9.6")
+
+    implementation("com.squareup.retrofit2:retrofit:3.0.0")
+    implementation("com.squareup.retrofit2:converter-moshi:3.0.0")
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.2")
 }

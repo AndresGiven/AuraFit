@@ -1,16 +1,21 @@
 package week11.stn697771.aurafit.viewmodel
 
+import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.compose.runtime.State
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import week11.stn697771.aurafit.data.NutritionGuess
 import week11.stn697771.aurafit.util.UiState
 import week11.stn697771.aurafit.data.UserRepo
 import week11.stn697771.aurafit.model.Meal
 import week11.stn697771.aurafit.util.NavEvent
+import week11.stn697771.aurafit.network.SpoonacularService
 
 /*
 The MainViewModel serves as the central hub for UI-related logic and state management for the main screens
@@ -29,6 +34,10 @@ class MainViewModel : ViewModel() {
 
     private val _navEvents = MutableSharedFlow<NavEvent>()
     val navEvents: MutableSharedFlow<NavEvent> = _navEvents
+
+    //public because it must be mutable by the UI
+    val nutrition = mutableStateOf<NutritionGuess?>(null)
+
 
 
     // Error message (for Snackbar)
@@ -142,6 +151,17 @@ class MainViewModel : ViewModel() {
     //Able to be called from outside
     fun navigate(event: NavEvent) {
         viewModelScope.launch { sendEvent(event) }
+    }
+
+    fun guessNutrition(meal: String){
+        viewModelScope.launch {
+            val result = SpoonacularService.api.guessNutrition(meal)
+            Log.d("API", result.toString())
+        }
+    }
+
+    fun clearNutrition() {
+        nutrition.value = null
     }
 
 }

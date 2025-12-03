@@ -89,7 +89,7 @@ class MainActivity : ComponentActivity() {
                     ) {
                         composable("loading") {
                             Text(
-                                "RAHHHHHHHHH",
+                                "Loading...",
                                 color = MaterialTheme.colorScheme.primary
                             )
                         }
