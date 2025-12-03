@@ -32,6 +32,9 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,16 +52,30 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.LifecycleOwner
 import week11.stn697771.aurafit.ui.theme.LocalNutrientColors
 import week11.stn697771.aurafit.viewmodel.MainViewModel
 
 @Composable
 fun Pedometer(vm: MainViewModel) {
     val scrollState = rememberScrollState()
+    val steps by vm.steps.collectAsState()
+    val goal = 10000
+    val progress = (steps.toFloat() / goal).coerceIn(0f, 1f)
+
+
+
+    DisposableEffect(key1 = vm) {
+        vm.startStepTracking()
+        onDispose {
+            vm.stopStepTracking()
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(scrollState) // <-- makes it scrollable
+            .verticalScroll(scrollState)
             .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 18.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -88,8 +105,11 @@ fun Pedometer(vm: MainViewModel) {
         Spacer(modifier = Modifier.height(12.dp))
         TopMeasurementBar()
         Spacer(modifier = Modifier.height(36.dp))
-        CutCircularPedometer(progress = 1f)
+        CutCircularPedometer(progress = steps.toFloat()/goal, steps = steps, goal = goal)
         Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = { vm.simulateSteps(10) }) {
+            Text("Add 10 Fake Steps")
+        }
         ProgressBars()
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = { vm.logout() }) {
@@ -99,7 +119,6 @@ fun Pedometer(vm: MainViewModel) {
         Spacer(modifier = Modifier.height(20.dp)) // optional bottom spacing
     }
 }
-
 
 @Composable
 fun TopMeasurementBar() {
@@ -117,7 +136,7 @@ fun TopMeasurementBar() {
             verticalArrangement = Arrangement.Bottom
         ) {
             Icon(
-                imageVector = Icons.Default.Whatshot,
+                imageVector = Icons.Filled.Whatshot,
                 contentDescription = "Fire Symbol",
                 tint = Color.White
             )
@@ -149,7 +168,7 @@ fun TopMeasurementBar() {
             verticalArrangement = Arrangement.Bottom
         ) {
             Icon(
-                imageVector = Icons.Default.Schedule,
+                imageVector = Icons.Filled.Schedule,
                 contentDescription = "Time Clock",
                 tint = Color.White
             )
@@ -187,10 +206,9 @@ fun CutCircularPedometer(
     val totalSweep = 260f
     val startAngle = 140f
     val progressSweep = progress * totalSweep
-    val progressSweepTEMP = progressSweep - 90f
 
     Box(
-        modifier = modifier.size(310.dp), //change this for outer ring
+        modifier = modifier.size(310.dp),
         contentAlignment = Alignment.Center
     ) {
         Canvas(Modifier.fillMaxSize()) {
@@ -201,13 +219,13 @@ fun CutCircularPedometer(
                 startAngle = startAngle,
                 sweepAngle = totalSweep,
                 useCenter = false,
-                style = Stroke(strokeWidth, cap = StrokeCap.Round),
+                style = Stroke(strokeWidth, cap = StrokeCap.Round)
             )
 
             drawArc(
                 brush = Brush.sweepGradient(gradientColors),
                 startAngle = startAngle,
-                sweepAngle = progressSweepTEMP,
+                sweepAngle = progressSweep,
                 useCenter = false,
                 style = Stroke(strokeWidth, cap = StrokeCap.Round)
             )
@@ -350,47 +368,7 @@ fun NutritionProgressItem(
     }
 }
 
-////Used from https://m3.material.io/components/progress-indicators/overview
-//@Composable
-//fun LinearDeterminateIndicator() {
-//    var currentProgress by remember { mutableFloatStateOf(0f) }
-//    var loading by remember { mutableStateOf(false) }
-//    val scope = rememberCoroutineScope() // Create a coroutine scope
-//
-//    Column(
-//        verticalArrangement = Arrangement.spacedBy(12.dp),
-//        horizontalAlignment = Alignment.CenterHorizontally,
-//        modifier = Modifier.fillMaxWidth()
-//    ) {
-//        Button(onClick = {
-//            loading = true
-//            scope.launch {
-//                loadProgress { progress ->
-//                    currentProgress = progress
-//                }
-//                loading = false // Reset loading when the coroutine finishes
-//            }
-//        }, enabled = !loading) {
-//            Text("Start loading")
-//        }
-//
-//        if (loading) {
-//            LinearProgressIndicator(
-//                progress = { currentProgress },
-//                modifier = Modifier.fillMaxWidth(),
-//            )
-//        }
-//    }
-//}
-//
-///** Iterate the progress value */
-//suspend fun loadProgress(updateProgress: (Float) -> Unit) {
-//    for (i in 1..100) {
-//        updateProgress(i.toFloat() / 100)
-//        delay(100)
-//    }
-//}
-
+//// Placeholder screens
 @Composable
 fun InsightsScreen(vm: MainViewModel){
     Text("INSIGHTS SCREEN", color = Color.Black)
