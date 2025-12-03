@@ -52,7 +52,6 @@ class UserRepo {
             .set(stepData)
             .await()
 
-        println("Writing steps to Firestore for day $today: $steps")
     }
 
 
