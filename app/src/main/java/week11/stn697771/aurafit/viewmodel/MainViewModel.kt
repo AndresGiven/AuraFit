@@ -30,32 +30,24 @@ class MainViewModel(application: Application) :
 
     private val auth = FirebaseAuth.getInstance()
     private val repo = UserRepo()
-
     // UiState for login/auth
     // Tracks whether the user is authenticated, or requires authentication, or is in a loading state.
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState
-
     private val _navEvents = MutableSharedFlow<NavEvent>()
     val navEvents: MutableSharedFlow<NavEvent> = _navEvents
-
     // Error message (for Snack bar)
     // Provides a mechanism to display transient messages or errors to the user (e.g., in a Snack bar).
     private val _message = MutableStateFlow<String?>(null)
-
     // Sensor Manager used to access the physical step counter sensor.
     private val sensorManager =
         application.getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
-
-
     // Exposed steps StateFlow used by the UI (Pedometer screen).
     private val _steps = MutableStateFlow(0)
     val steps: StateFlow<Int> = _steps
-
     // Stores the initial step count from the sensor so we can calculate relative steps.
     private var initialSteps: Float? = null
-
     private var hasInitialized = false  // Add this
 
     // Starts listening to the step counter sensor.
@@ -66,9 +58,12 @@ class MainViewModel(application: Application) :
 
     private var lastStepTime = 0L   // Add this at the top of your ViewModel
 
+    private var lastSavedSteps = 0
+
+
     fun startStepTracking() {
         if (isTracking) {
-            println("🔥 Already tracking, skipping registration")
+            println("Already tracking, skipping registration")
             return
         }
 
@@ -82,7 +77,7 @@ class MainViewModel(application: Application) :
             )
             if (success) {
                 isTracking = true
-                println("🔥 Using accelerometer for step detection")
+                println("Using accelerometer for step detection")
             }
         } ?: run {
             viewModelScope.launch {
@@ -99,7 +94,7 @@ class MainViewModel(application: Application) :
         if (isTracking) {
             sensorManager.unregisterListener(this)
             isTracking = false
-            println("🔥 Stopped tracking")
+            println("Stopped tracking")
         }
     }
 
@@ -121,7 +116,7 @@ class MainViewModel(application: Application) :
                     if (!hasInitialized) {
                         initialSteps = totalSteps
                         hasInitialized = true
-                        println("🔥 INITIALIZED: initial=$initialSteps")
+                        println("INITIALIZED: initial=$initialSteps")
                     }
                     val currentSteps = (totalSteps - (initialSteps ?: 0f)).toInt()
                     _steps.value = currentSteps
@@ -144,9 +139,25 @@ class MainViewModel(application: Application) :
                     if (magnitude > 12.5f) {
                         lastStepTime = now
                         _steps.value += 1
-                        println("🔥 STEP DETECTED via ACCELEROMETER. Total = ${_steps.value}")
+                        println("STEP DETECTED via ACCELEROMETER. Total = ${_steps.value}")
+
+                        if (_steps.value - lastSavedSteps >= 20) {
+                            lastSavedSteps = _steps.value
+                            saveStepsToFirebase()
+                        }
                     }
                 }
+            }
+        }
+    }
+
+    fun saveStepsToFirebase() {
+        viewModelScope.launch {
+            try {
+                repo.saveSteps(_steps.value)
+                println("SAVED TO FIREBASE: ${_steps.value}")
+            } catch (e: Exception) {
+                println("Failed to save steps: ${e.message}")
             }
         }
     }
