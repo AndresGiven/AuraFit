@@ -39,22 +39,15 @@ class MainViewModel(application: Application) :
     private val _navEvents = MutableSharedFlow<NavEvent>()
     val navEvents: MutableSharedFlow<NavEvent> = _navEvents
 
-    // Error message (for Snackbar)
-    // Provides a mechanism to display transient messages or errors to the user (e.g., in a Snackbar).
+    // Error message (for Snack bar)
+    // Provides a mechanism to display transient messages or errors to the user (e.g., in a Snack bar).
     private val _message = MutableStateFlow<String?>(null)
-    val message: StateFlow<String?> = _message
 
     // Sensor Manager used to access the physical step counter sensor.
     private val sensorManager =
         application.getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
-    // The TYPE_STEP_COUNTER sensor (if available on the device).
-    private val stepSensor: Sensor? =
-        sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
 
-    // Backup TYPE_STEP_DETECTOR for emulator/testing
-    private val stepDetector: Sensor? =
-        sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
 
     // Exposed steps StateFlow used by the UI (Pedometer screen).
     private val _steps = MutableStateFlow(0)
@@ -71,10 +64,6 @@ class MainViewModel(application: Application) :
     private val accelerometer: Sensor? =
         sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
 
-    private var lastAcceleration = 0f
-    private var currentAcceleration = 0f
-    private var acceleration = 10f
-    private val STEP_THRESHOLD = 12f  // Adjust this for sensitivity
     private var lastStepTime = 0L   // Add this at the top of your ViewModel
 
     fun startStepTracking() {
@@ -83,21 +72,6 @@ class MainViewModel(application: Application) :
             return
         }
 
-        // TEMPORARILY DISABLED - Force accelerometer use
-        /*
-        stepSensor?.let { sensor ->
-            val success = sensorManager.registerListener(
-                this,
-                sensor,
-                SensorManager.SENSOR_DELAY_NORMAL
-            )
-            if (success) {
-                isTracking = true
-                println("🔥 Step counter registered: $success")
-                return
-            }
-        }
-        */
 
         // Fallback to accelerometer-based step detection
         accelerometer?.let { sensor ->
@@ -111,7 +85,6 @@ class MainViewModel(application: Application) :
                 println("🔥 Using accelerometer for step detection")
             }
         } ?: run {
-            // Emulator fallback
             viewModelScope.launch {
                 isTracking = true
                 while (isTracking) {
@@ -130,7 +103,7 @@ class MainViewModel(application: Application) :
         }
     }
 
-    // --- SIMULATE STEPS BUTTON ---
+
     fun simulateSteps(count: Int) {
         viewModelScope.launch {
             _steps.value += count

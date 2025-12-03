@@ -107,9 +107,6 @@ fun Pedometer(vm: MainViewModel) {
         Spacer(modifier = Modifier.height(36.dp))
         CutCircularPedometer(progress = steps.toFloat()/goal, steps = steps, goal = goal)
         Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = { vm.simulateSteps(10) }) {
-            Text("Add 10 Fake Steps")
-        }
         ProgressBars()
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = { vm.logout() }) {
