@@ -5,6 +5,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import week11.stn697771.aurafit.model.Meal
 import com.google.firebase.Timestamp
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 /*
 The UserRepo class is responsible for handling all interactions with Firebase
@@ -36,6 +39,8 @@ class UserRepo {
     suspend fun saveSteps(steps: Int) {
         val user = auth.currentUser ?: return
 
+        val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+
         val stepData = mapOf(
             "steps" to steps,
             "timestamp" to Timestamp.now()
@@ -44,11 +49,10 @@ class UserRepo {
         db.collection("users")
             .document(user.uid)
             .collection("pedometer")
-            .document("latest")
+            .document(today)
             .set(stepData)
             .await()
 
-        println("Writing steps to Firestore: $steps")
 
     }
 
