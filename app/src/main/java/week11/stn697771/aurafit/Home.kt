@@ -61,7 +61,6 @@ fun Pedometer(vm: MainViewModel) {
     val scrollState = rememberScrollState()
     val steps by vm.steps.collectAsState()
     val goal = 10000
-    val progress = (steps.toFloat() / goal).coerceIn(0f, 1f)
 
 
 
@@ -183,7 +182,7 @@ fun TopMeasurementBar() {
 fun CutCircularPedometer(
     modifier: Modifier = Modifier,
     progress: Float,
-    steps: Int = 6543,
+    steps: Int,
     goal: Int = 10000
 ) {
     val auraPrimary = MaterialTheme.colorScheme.primary

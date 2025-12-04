@@ -37,9 +37,9 @@ class MainActivity : ComponentActivity() {
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            println("🔥 Activity Recognition permission GRANTED!")
+            println(" Activity Recognition permission GRANTED!")
         } else {
-            println("🔥 Activity Recognition permission DENIED!")
+            println("Activity Recognition permission DENIED!")
         }
     }
 
@@ -52,7 +52,7 @@ class MainActivity : ComponentActivity() {
                     this,
                     Manifest.permission.ACTIVITY_RECOGNITION
                 ) == PackageManager.PERMISSION_GRANTED -> {
-                    println("🔥 Permission already granted")
+                    println("Permission already granted")
                 }
                 else -> {
                     requestPermissionLauncher.launch(
@@ -162,7 +162,7 @@ class MainActivity : ComponentActivity() {
                     101
                 )
             } else {
-                // Permission already granted, you can start pedometer logic here if needed
+
             }
         }
     }

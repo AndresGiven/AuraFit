@@ -9,6 +9,7 @@ import android.hardware.SensorManager
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +18,11 @@ import kotlinx.coroutines.launch
 import week11.stn697771.aurafit.util.UiState
 import week11.stn697771.aurafit.data.UserRepo
 import week11.stn697771.aurafit.model.Meal
+import week11.stn697771.aurafit.model.Steps
 import week11.stn697771.aurafit.util.NavEvent
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 /*
 The MainViewModel serves as the central hub for UI-related logic and state management for the main screens
@@ -45,18 +50,18 @@ class MainViewModel(application: Application) :
 
     // Exposed steps StateFlow used by the UI (Pedometer screen).
     private val _steps = MutableStateFlow(0)
+
     val steps: StateFlow<Int> = _steps
     // Stores the initial step count from the sensor so we can calculate relative steps.
     private var initialSteps: Float? = null
     private var hasInitialized = false  // Add this
 
-    // Starts listening to the step counter sensor.
-    private var isTracking = false  // Add this flag
+    private var isTracking = false
 
     private val accelerometer: Sensor? =
         sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
 
-    private var lastStepTime = 0L   // Add this at the top of your ViewModel
+    private var lastStepTime = 0L
 
     private var lastSavedSteps = 0
 
@@ -163,7 +168,7 @@ class MainViewModel(application: Application) :
     }
 
 
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) { /* Not required */ }
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {  }
 
     init {
         // Observe FirebaseAuth state
@@ -177,6 +182,16 @@ class MainViewModel(application: Application) :
                 _uiState.value = UiState.Authenticated
                 sendEvent(NavEvent.ToPedometer)
             }
+        }
+        viewModelScope.launch {
+            val firebaseSteps = repo.getSteps()
+            _steps.value = firebaseSteps
+        }
+    }
+
+    fun saveStepsToFirebase(currentSteps: Int) {
+        viewModelScope.launch {
+            repo.saveSteps(currentSteps)
         }
     }
 
@@ -248,6 +263,28 @@ class MainViewModel(application: Application) :
                 sendEvent(NavEvent.ToLogin)
             }
     }
+
+    fun fetchStepsFromFirebase() {
+        val user = FirebaseAuth.getInstance().currentUser ?: return
+        val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+
+        val docRef = FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(user.uid)
+            .collection("pedometer")
+            .document(today)
+
+        docRef.get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val stepsData = document.toObject(Steps::class.java)
+                    _steps.value = stepsData?.steps ?: 0
+                } else {
+                    _steps.value = 0 // default if no data
+                }
+            }
+    }
+
 
     fun saveMeal(meal: Meal){
         viewModelScope.launch {

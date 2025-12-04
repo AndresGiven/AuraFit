@@ -53,8 +53,26 @@ class UserRepo {
             .set(stepData)
             .await()
 
-
     }
+    suspend fun getSteps(): Int {
+        val user = auth.currentUser ?: return 0
+
+        val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+
+        return try {
+            val docSnapshot = db.collection("users")
+                .document(user.uid)
+                .collection("pedometer")
+                .document(today)
+                .get()
+                .await()
+
+            docSnapshot.getLong("steps")?.toInt() ?: 0
+        } catch (e: Exception) {
+            0
+        }
+    }
+
 
 
 }
