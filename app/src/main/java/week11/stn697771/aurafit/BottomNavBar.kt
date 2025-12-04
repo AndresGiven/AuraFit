@@ -66,13 +66,15 @@ fun BottomNavigationBar(
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.primary,
         modifier = Modifier
+            .height(70.dp)
             .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
             .clip(RoundedCornerShape(100.dp))
     ) {
         items.forEach { screen ->
             NavigationBarItem(
                 icon = { Icon(screen.icon, contentDescription = screen.label, modifier = Modifier.size(32.dp)) },
-                label = { Text(screen.label) },
+                alwaysShowLabel = false,
+                //label = { Text(screen.label) },
                 selected = currentRoute == screen.route,
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = Color.White,
