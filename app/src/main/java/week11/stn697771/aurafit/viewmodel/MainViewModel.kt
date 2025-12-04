@@ -6,7 +6,9 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.compose.runtime.State
@@ -18,6 +20,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import week11.stn697771.aurafit.data.NutritionGuess
 import week11.stn697771.aurafit.data.SavedMeal
@@ -28,8 +31,13 @@ import week11.stn697771.aurafit.model.Steps
 import week11.stn697771.aurafit.util.NavEvent
 import week11.stn697771.aurafit.network.SpoonacularService
 import java.text.SimpleDateFormat
+import java.time.DayOfWeek
+import java.time.LocalDate
 import java.util.Date
 import java.util.Locale
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.forEach
 
 /*
 The MainViewModel serves as the central hub for UI-related logic and state management for the main screens
@@ -52,7 +60,8 @@ class MainViewModel(application: Application) :
     //public because it must be mutable by the UI
     val nutrition = mutableStateOf<NutritionGuess?>(null)
 
-
+    private val _weeklySteps = MutableStateFlow<List<Float>>(emptyList())
+    val weeklySteps = _weeklySteps.asStateFlow()
 
     // Error message (for Snackbar)
     // Provides a mechanism to display transient messages or errors to the user (e.g., in a Snackbar).
@@ -340,6 +349,7 @@ class MainViewModel(application: Application) :
                 createdAt = Timestamp.now()
             )
             repo.addMealItem(savedMeal)
+            clearNutrition()
         }
     }
 
@@ -347,4 +357,38 @@ class MainViewModel(application: Application) :
         nutrition.value = null
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun loadWeeklySteps() {
+        viewModelScope.launch {
+            val days = (0..6).map { LocalDate.now().minusDays(it.toLong()) }
+
+            val rawMap = mutableMapOf<LocalDate, Float>()
+
+            for (day in days) {
+                val doc = repo.getStepsForDay(day.toString())
+                rawMap[day] = doc ?: 0f
+            }
+
+            _weeklySteps.value = alignToWeek(rawMap)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun alignToWeek(values: Map<LocalDate, Float>): List<Float> {
+        val result = MutableList(7) { 0f }
+
+        values.forEach { (date, steps) ->
+            val dayIndex = when (date.dayOfWeek) {
+                DayOfWeek.MONDAY -> 0
+                DayOfWeek.TUESDAY -> 1
+                DayOfWeek.WEDNESDAY -> 2
+                DayOfWeek.THURSDAY -> 3
+                DayOfWeek.FRIDAY -> 4
+                DayOfWeek.SATURDAY -> 5
+                DayOfWeek.SUNDAY -> 6
+            }
+            result[dayIndex] = steps
+        }
+        return result
+    }
 }
