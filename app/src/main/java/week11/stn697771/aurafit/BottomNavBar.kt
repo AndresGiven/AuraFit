@@ -81,9 +81,8 @@ fun BottomNavigationBar(
                 ),
                 onClick = {
                     if(screen.route == "addMeal"){
-                        showDialog = true
                         step = 1
-                        //vm.guessNutrition("Alfredo")
+                        showDialog = true
                     }
                     else if (currentRoute != screen.route) {
                         vm.navigate(NavEvent.NavigateTo(screen.route))
@@ -103,6 +102,7 @@ fun BottomNavigationBar(
                 step = { step = 2},
             )
             2 -> MacrosDialog(
+                textInput = textInput,
                 vm,
                 onDismiss = { showDialog = false },
             )

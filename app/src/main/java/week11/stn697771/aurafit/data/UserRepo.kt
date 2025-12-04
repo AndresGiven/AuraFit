@@ -17,19 +17,15 @@ class UserRepo {
     // get instance of Firestore
     private val db = FirebaseFirestore.getInstance()
 
-    suspend fun addMealItem(item: Meal) {
+    suspend fun addMealItem(item: SavedMeal) {
         // It retrieves the currently authenticated user. If no user is logged in, it returns
         val user = auth.currentUser ?: return
 
-        // It creates a copy of the TodoItem and populates the userEmail field with the current user's email
-        val itemWithEmail = item.copy(userEmail = user.email)
-        // it stores the item in a specific path in Firestore: users/{user.uid}/todos/.
+        // it stores the item in a specific path in Firestore: users/{user.uid}/meals/.
         db.collection("users")
             .document(user.uid)
             .collection("meals")
-            .add(itemWithEmail)
-            // It uses await() from kotlinx.coroutines.tasks to make the Firestore add operation a suspending function,
-            // allowing for asynchronous handling
+            .add(item)
             .await()
     }
 }

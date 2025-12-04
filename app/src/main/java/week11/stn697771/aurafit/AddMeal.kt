@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -38,6 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import week11.stn697771.aurafit.data.Macro
 import week11.stn697771.aurafit.data.NutritionGuess
 import week11.stn697771.aurafit.model.Meal
 import week11.stn697771.aurafit.ui.theme.LocalNutrientColors
@@ -110,10 +112,9 @@ fun AddMeal(
                             unfocusedIndicatorColor = Color.White,
                             cursorColor = Color.White
                         ),
-                        shape = RoundedCornerShape(12.dp) // this actually rounds the corners
+                        shape = RoundedCornerShape(12.dp)
                     )
 
-                    // Confirm button at center bottom
                     Button(
                         onClick = {
                             val meal = textInput.trim()
@@ -144,6 +145,7 @@ fun AddMeal(
 
 @Composable
 fun MacrosDialog(
+    textInput: String,
     vm: MainViewModel,
     onDismiss: () -> Unit
 ) {
@@ -153,7 +155,7 @@ fun MacrosDialog(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(260.dp)
+                .height(336.dp)
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
 
@@ -171,22 +173,104 @@ fun MacrosDialog(
                         .padding(24.dp)
                 ) {
                     Text(
-                        text = "Macros",
+                        text = "Here you go!",
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 30.sp,
                     )
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .padding(start = 24.dp)
+                            .width(85.dp),
+                        thickness = 2.dp,
+                        color = Color.White,
+                    )
 
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Text("Calories: ${vm.nutrition.value?.calories?.value} ${vm.nutrition.value?.calories?.unit}")
-                    Text("Carbs: ${vm.nutrition.value?.carbs?.value} ${vm.nutrition.value?.carbs?.unit}")
-                    Text("Fat: ${vm.nutrition.value?.fat?.value} ${vm.nutrition.value?.fat?.unit}")
-                    Text("Protein: ${vm.nutrition.value?.protein?.value} ${vm.nutrition.value?.protein?.unit}")
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(textInput)
+                    Column(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(20.dp))
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.tertiary)
+                            .padding(6.dp)
+                    ) {
+                        Text(
+                            "Macros",
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 20.sp,
+                        )
+                        MacroItem(Macro.Protein, vm)
+                        MacroItem(Macro.Carbs, vm)
+                        MacroItem(Macro.Fat, vm)
+                        MacroItem(Macro.Calories, vm)
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Column(
+                    modifier = Modifier
+                        .padding(6.dp)
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                ){
+                    Button(
+                        onClick = {
+                            val meal = textInput.trim()
+                            if (meal.isNotEmpty()) {
+                                vm.saveNutritionInfo(meal)
+                                onDismiss()
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.tertiary,
+                        ),
+                        modifier = Modifier
+                            .padding(top = 4.dp)
+                            .align(Alignment.CenterHorizontally)
+                    ) {
+                        Text(
+                            "Save",
+                            color = Color.White,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                    }
                 }
             }
         }
     }
 }
+
+@Composable
+fun MacroItem(macro: Macro, vm: MainViewModel) {
+    val colors = LocalNutrientColors.current
+
+    val value = macro.valueProvider(vm) ?: 0.0
+    val color = macro.colorKey(colors)
+
+    Row(
+        modifier = Modifier
+            .padding(12.dp, 12.dp, 12.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(macro.label, color = Color.White)
+
+        Text(
+            text = if (macro.showUnit) "${value}g" else "$value",
+            color = Color.White
+        )
+    }
+
+    HorizontalDivider(
+        modifier = Modifier
+            .padding(horizontal = 12.dp)
+            .fillMaxWidth(),
+        thickness = 3.dp,
+        color = color
+    )
+}
+
 
 
 

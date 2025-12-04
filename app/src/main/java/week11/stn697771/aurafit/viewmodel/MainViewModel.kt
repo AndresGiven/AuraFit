@@ -5,12 +5,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.compose.runtime.State
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import week11.stn697771.aurafit.data.NutritionGuess
+import week11.stn697771.aurafit.data.SavedMeal
 import week11.stn697771.aurafit.util.UiState
 import week11.stn697771.aurafit.data.UserRepo
 import week11.stn697771.aurafit.model.Meal
@@ -130,11 +132,11 @@ class MainViewModel : ViewModel() {
             }
     }
 
-    fun saveMeal(meal: Meal){
-        viewModelScope.launch {
-            repo.addMealItem(meal)
-        }
-    }
+//    fun saveMeal(meal: Meal){
+//        viewModelScope.launch {
+//            repo.addMealItem(meal)
+//        }
+//    }
 
 // Provides a way for the UI to clear any displayed error messages once they have been shown to the user.
     fun changeUIState(state: UiState) {
@@ -156,7 +158,23 @@ class MainViewModel : ViewModel() {
     fun guessNutrition(meal: String){
         viewModelScope.launch {
             val result = SpoonacularService.api.guessNutrition(meal)
-            Log.d("API", result.toString())
+            Log.d("MLog", result.toString())
+            nutrition.value = result
+            Log.d("MLog", nutrition.value.toString())
+        }
+    }
+
+    fun saveNutritionInfo(meal: String) {
+        viewModelScope.launch {
+            val savedMeal = SavedMeal(
+                name = meal,
+                calories = nutrition.value?.calories?.value ?: 0.0,
+                carbs = nutrition.value?.carbs?.value ?: 0.0,
+                protein = nutrition.value?.protein?.value ?: 0.0,
+                fat = nutrition.value?.fat?.value ?: 0.0,
+                createdAt = Timestamp.now()
+            )
+            repo.addMealItem(savedMeal)
         }
     }
 
