@@ -1,6 +1,5 @@
 package week11.stn697771.aurafit
 
-
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -23,9 +22,46 @@ import week11.stn697771.aurafit.ui.theme.AuraFitTheme
 import week11.stn697771.aurafit.util.NavEvent
 import week11.stn697771.aurafit.viewmodel.MainViewModel
 
+// --- ADDED IMPORTS FOR PEDOMETER PERMISSION ---
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+
 class MainActivity : ComponentActivity() {
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            println(" Activity Recognition permission GRANTED!")
+        } else {
+            println("Activity Recognition permission DENIED!")
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Request permission
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            when {
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACTIVITY_RECOGNITION
+                ) == PackageManager.PERMISSION_GRANTED -> {
+                    println("Permission already granted")
+                }
+                else -> {
+                    requestPermissionLauncher.launch(
+                        Manifest.permission.ACTIVITY_RECOGNITION
+                    )
+                }
+            }
+        }
+        checkActivityRecognitionPermission() // <-- already present
         setContent {
             AuraFitTheme {
                 val vm: MainViewModel = viewModel()
@@ -38,24 +74,30 @@ class MainActivity : ComponentActivity() {
                             NavEvent.ToLogin -> navController.navigate("login") {
                                 popUpTo(navController.graph.startDestinationId) { inclusive = true }
                             }
+
                             NavEvent.ToSignUp -> navController.navigate("signup")
                             NavEvent.ToForgot -> navController.navigate("forgot")
                             NavEvent.ToPedometer -> navController.navigate("pedometer") {
                                 popUpTo(navController.graph.startDestinationId) { inclusive = true }
                             }
+
                             NavEvent.ToInsights -> navController.navigate("insights") {
                                 popUpTo(navController.graph.startDestinationId) { inclusive = true }
                             }
+
                             NavEvent.ToAddMeal -> navController.navigate("addMeal") {
                                 popUpTo(navController.graph.startDestinationId) { inclusive = true }
                             }
+
                             NavEvent.ToProfile -> navController.navigate("profile") {
                                 popUpTo(navController.graph.startDestinationId) { inclusive = true }
                             }
 
                             is NavEvent.NavigateTo -> {
                                 navController.navigate(event.route) {
-                                    popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
                                     launchSingleTop = true
                                     restoreState = true
                                 }
@@ -105,10 +147,40 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
     }
+
+    // --- ADDED FUNCTIONS FOR PEDOMETER PERMISSION ---
+    private fun checkActivityRecognitionPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.ACTIVITY_RECOGNITION),
+                    101
+                )
+            } else {
+
+            }
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 101) {
+            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                Toast.makeText(this, "Permission granted!", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Permission denied. Pedometer won't work.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+
 }
-
-
-
-
-
