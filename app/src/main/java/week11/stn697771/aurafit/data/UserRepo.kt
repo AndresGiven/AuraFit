@@ -73,6 +73,39 @@ class UserRepo {
         }
     }
 
+    suspend fun saveGoal(goalName: String, value: String) {
+        val user = auth.currentUser ?: return
+
+        val goalData = mapOf(
+            "value" to value
+        )
+
+        db.collection("users")
+            .document(user.uid)
+            .collection("goals")
+            .document(goalName)
+            .set(goalData)
+            .await()
+    }
+    suspend fun getGoal(goalName: String): String {
+        val user = auth.currentUser ?: return "0" // default if no user
+
+        return try {
+            val docSnapshot = db.collection("users")
+                .document(user.uid)
+                .collection("goals")
+                .document(goalName)
+                .get()
+                .await()
+
+            docSnapshot.getString("value") ?: "0"
+        } catch (e: Exception) {
+            "0"
+        }
+    }
+
+
+
 
     suspend fun getStepsForDay(dateId: String): Float? {
         Log.d("MyLog", "Getting steps for date: $dateId")

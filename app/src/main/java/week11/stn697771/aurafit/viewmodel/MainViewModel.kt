@@ -87,6 +87,18 @@ class MainViewModel(application: Application) :
 
     private var lastSavedSteps = 0
 
+    // MutableState to control dialog from VM
+    val showDialog = mutableStateOf(false)
+    val dialogTitle = mutableStateOf("")
+    val dialogValue = mutableStateOf("")
+    private var onSaveDialog: (String) -> Unit = {}
+
+    val stepsGoal = mutableStateOf("10000")
+    val proteinGoal = mutableStateOf("90")
+    val carbsGoal = mutableStateOf("310")
+    val fatsGoal = mutableStateOf("70")
+    val caloriesGoal = mutableStateOf("1800")
+
 
     fun startStepTracking() {
         if (isTracking) {
@@ -189,6 +201,45 @@ class MainViewModel(application: Application) :
         }
     }
 
+    fun editGoal(goalTitle: String, currentValue: String) {
+        dialogTitle.value = goalTitle
+        dialogValue.value = currentValue
+        onSaveDialog = { newValue ->
+            when(goalTitle) {
+                "Edit Steps" -> stepsGoal.value = newValue
+                "Edit Protein" -> proteinGoal.value = newValue
+                "Edit Carbs" -> carbsGoal.value = newValue
+                "Edit Fats" -> fatsGoal.value = newValue
+                "Edit Calories" -> caloriesGoal.value = newValue
+            }
+
+            // Save permanent goal to Firebase
+            viewModelScope.launch {
+                val goalKey = when(goalTitle) {
+                    "Edit Steps" -> "steps"
+                    "Edit Protein" -> "protein"
+                    "Edit Carbs" -> "carbs"
+                    "Edit Fats" -> "fats"
+                    "Edit Calories" -> "calories"
+                    else -> goalTitle.lowercase()
+                }
+                repo.saveGoal(goalKey, newValue)
+            }
+        }
+        showDialog.value = true
+    }
+
+
+
+    fun onDialogSave(newValue: String) {
+        onSaveDialog(newValue)
+        showDialog.value = false
+    }
+
+    fun onDialogCancel() {
+        showDialog.value = false
+    }
+
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {  }
 
@@ -208,7 +259,13 @@ class MainViewModel(application: Application) :
         viewModelScope.launch {
             val firebaseSteps = repo.getSteps()
             _steps.value = firebaseSteps
+            stepsGoal.value = repo.getGoal("steps")
+            proteinGoal.value = repo.getGoal("protein")
+            carbsGoal.value = repo.getGoal("carbs")
+            fatsGoal.value = repo.getGoal("fats")
+            caloriesGoal.value = repo.getGoal("calories")
         }
+
     }
 
     fun saveStepsToFirebase(currentSteps: Int) {
