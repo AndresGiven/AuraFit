@@ -281,26 +281,26 @@ fun MacroItem(
                 color = Color.White
             )
 
-            Box(
-                modifier = Modifier
-                    .padding(start = 8.dp, bottom = 2.dp)
-                    .size(24.dp)
-                    .clickable {
-                        when (macro) {
-                            Macro.Protein -> editProtein()
-                            Macro.Calories -> editCalories()
-                            Macro.Carbs -> editCarbs()
-                            Macro.Fat -> editFat()
-                        }
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.BorderColor,
-                    contentDescription = "Edit",
-                    tint = editColor
-                )
-            }
+//            Box(
+//                modifier = Modifier
+//                    .padding(start = 8.dp, bottom = 2.dp)
+//                    .size(24.dp)
+//                    .clickable {
+//                        when (macro) {
+//                            Macro.Protein -> editProtein()
+//                            Macro.Calories -> editCalories()
+//                            Macro.Carbs -> editCarbs()
+//                            Macro.Fat -> editFat()
+//                        }
+//                    },
+//                contentAlignment = Alignment.Center
+//            ) {
+//                Icon(
+//                    imageVector = Icons.Default.BorderColor,
+//                    contentDescription = "Edit",
+//                    tint = editColor
+//                )
+//            }
         }
     }
 

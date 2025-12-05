@@ -167,7 +167,7 @@ fun TopMeasurementBar(vm: MainViewModel) {
                 tint = Color.White
             )
             Text(
-                text = "$kmDistance KM",
+                text = String.format("%.2f KM", kmDistance),
                 fontSize = 16.sp,
                 color = Color.White
             )
@@ -369,12 +369,6 @@ fun NutritionProgressItem(
                 color = Color.White,
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center
-            )
-            Icon(
-                Icons.Filled.Edit,
-                contentDescription = "Edit",
-                tint = Color.White,
-                modifier = Modifier.weight(1f).wrapContentWidth(Alignment.End)
             )
         }
     }
