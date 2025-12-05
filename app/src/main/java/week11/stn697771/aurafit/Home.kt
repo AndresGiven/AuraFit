@@ -173,7 +173,6 @@ fun TopMeasurementBar(vm: MainViewModel) {
             )
         }
     }
-
 }
 
 @Composable
@@ -292,17 +291,22 @@ fun CircularButton(
 
 @Composable
 fun ProgressBars(vm: MainViewModel) {
-    val proteinGoalString by vm.proteinGoal
-    val carbsGoalString by vm.carbsGoal
-    val fatsGoalString by vm.fatsGoal
-    val caloriesGoalString by vm.caloriesGoal
+    LaunchedEffect(Unit) {
+        vm.startListeningTodayMacros()
+    }
 
-    val proteinGoal = proteinGoalString.toFloatOrNull() ?: 1f
-    val carbsGoal = carbsGoalString.toFloatOrNull() ?: 1f
-    val fatsGoal = fatsGoalString.toFloatOrNull() ?: 1f
-    val caloriesGoal = caloriesGoalString.toFloatOrNull() ?: 1f
+    val protein = vm.todayProtein.value
+    val carbs = vm.todayCarbs.value
+    val fats = vm.todayFat.value
+    val calories = vm.todayCalories.value
+
+    val proteinGoal = vm.proteinGoal.value.toFloatOrNull() ?: 1f
+    val carbsGoal = vm.carbsGoal.value.toFloatOrNull() ?: 1f
+    val fatsGoal = vm.fatsGoal.value.toFloatOrNull() ?: 1f
+    val caloriesGoal = vm.caloriesGoal.value.toFloatOrNull() ?: 1f
 
     val colors = LocalNutrientColors.current
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -312,10 +316,10 @@ fun ProgressBars(vm: MainViewModel) {
         verticalArrangement = Arrangement.spacedBy(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        NutritionProgressItem("Protein", 59f, proteinGoal, "g",colors.protein)
-        NutritionProgressItem("Carbs", 163f, carbsGoal, "g", colors.carb)
-        NutritionProgressItem("Fat", 55f, fatsGoal, "g",colors.fat)
-        NutritionProgressItem("Cals", 1213f, caloriesGoal, "g",colors.cal)
+        NutritionProgressItem("Protein", protein, proteinGoal, "g", colors.protein)
+        NutritionProgressItem("Carbs", carbs, carbsGoal, "g", colors.carb)
+        NutritionProgressItem("Fat", fats, fatsGoal, "g", colors.fat)
+        NutritionProgressItem("Calories", calories, caloriesGoal, "kcal", colors.cal)
     }
 }
 

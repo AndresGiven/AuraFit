@@ -8,8 +8,10 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import week11.stn697771.aurafit.model.Meal
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.ListenerRegistration
 import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -122,6 +124,38 @@ class UserRepo {
 
         } catch (e: Exception) {
             null
+        }
+    }
+
+    fun listenMealsForToday(onUpdate: (List<Map<String, Any>>) -> Unit): ListenerRegistration {
+        val userId = auth.currentUser?.uid ?: return ListenerRegistration {}
+
+        val calendar = Calendar.getInstance()
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+        val startOfDay = calendar.time
+
+        calendar.set(Calendar.HOUR_OF_DAY, 23)
+        calendar.set(Calendar.MINUTE, 59)
+        calendar.set(Calendar.SECOND, 59)
+        calendar.set(Calendar.MILLISECOND, 999)
+        val endOfDay = calendar.time
+
+        val ref = db.collection("users")
+            .document(userId)
+            .collection("meals")
+            .whereGreaterThanOrEqualTo("createdAt", startOfDay)
+            .whereLessThanOrEqualTo("createdAt", endOfDay)
+
+        return ref.addSnapshotListener { snapshot, _ ->
+            if (snapshot != null) {
+                val meals = snapshot.documents.mapNotNull { it.data }
+                onUpdate(meals)
+            } else {
+                onUpdate(emptyList())
+            }
         }
     }
 }

@@ -12,10 +12,12 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -98,6 +100,20 @@ class MainViewModel(application: Application) :
     val carbsGoal = mutableStateOf("310")
     val fatsGoal = mutableStateOf("70")
     val caloriesGoal = mutableStateOf("1800")
+
+    private var listener: ListenerRegistration? = null
+
+    private val _todayProtein = mutableStateOf(0f)
+    val todayProtein: State<Float> = _todayProtein
+
+    private val _todayCarbs = mutableStateOf(0f)
+    val todayCarbs: State<Float> = _todayCarbs
+
+    private val _todayFat = mutableStateOf(0f)
+    val todayFat: State<Float> = _todayFat
+
+    private val _todayCalories = mutableStateOf(0f)
+    val todayCalories: State<Float> = _todayCalories
 
 
     fun startStepTracking() {
@@ -464,5 +480,20 @@ class MainViewModel(application: Application) :
             result[dayIndex] = steps
         }
         return result
+    }
+
+    fun startListeningTodayMacros() {
+        listener?.remove()
+        listener = repo.listenMealsForToday() { meals ->
+            _todayProtein.value = meals.sumOf { (it["protein"] as Number).toDouble() }.toFloat()
+            _todayCarbs.value = meals.sumOf { (it["carbs"] as Number).toDouble() }.toFloat()
+            _todayFat.value = meals.sumOf { (it["fat"] as Number).toDouble() }.toFloat()
+            _todayCalories.value = meals.sumOf { (it["calories"] as Number).toDouble() }.toFloat()
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        listener?.remove()
     }
 }
