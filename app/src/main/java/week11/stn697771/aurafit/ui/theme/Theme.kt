@@ -78,6 +78,7 @@ fun AuraFitTheme(
         cal = Cal,
         calLight = CalLight,
         calLightest = CalLightest,
+        step = Step,
         emptyProgress = EmptyProgress,
         disabled = Disabled
     )
