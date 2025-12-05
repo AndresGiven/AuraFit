@@ -116,22 +116,22 @@ fun Pedometer(vm: MainViewModel) {
         }
 
         Spacer(modifier = Modifier.height(12.dp))
-        TopMeasurementBar()
+        TopMeasurementBar(vm)
         Spacer(modifier = Modifier.height(36.dp))
         CutCircularPedometer(steps = steps, goal = goal)
         Spacer(modifier = Modifier.height(16.dp))
         ProgressBars(vm)
         Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = { vm.logout() }) {
-            Text("Logout")
-        }
-
-        Spacer(modifier = Modifier.height(20.dp)) // optional bottom spacing
+        Spacer(modifier = Modifier.height(20.dp))
     }
 }
 
 @Composable
-fun TopMeasurementBar() {
+fun TopMeasurementBar(vm: MainViewModel) {
+    val steps by vm.steps.collectAsState()
+    val calories = steps * 0.04
+    val distance = steps * 0.75
+    val kmDistance = distance / 1000
     Row(
         modifier = Modifier.fillMaxWidth()
             .clip(RoundedCornerShape(50.dp))
@@ -151,7 +151,7 @@ fun TopMeasurementBar() {
                 tint = Color.White
             )
             Text(
-                text = "330 kcal",
+                text = "$calories kcal",
                 fontSize = 16.sp,
                 color = Color.White
             )
@@ -167,23 +167,7 @@ fun TopMeasurementBar() {
                 tint = Color.White
             )
             Text(
-                text = "5.4 KM",
-                fontSize = 16.sp,
-                color = Color.White
-            )
-        }
-        Column(
-            modifier = Modifier,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Bottom
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Schedule,
-                contentDescription = "Time Clock",
-                tint = Color.White
-            )
-            Text(
-                text = "1.2 Hours",
+                text = "$kmDistance KM",
                 fontSize = 16.sp,
                 color = Color.White
             )
