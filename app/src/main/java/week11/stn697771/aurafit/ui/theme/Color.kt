@@ -28,3 +28,5 @@ val FatLightest = Color(0xFFFF9DA0)
 val Cal = Color(0xFFFA700B)
 val CalLight = Color(0xFFFF984D)
 val CalLightest = Color(0xFFFFBC8B)
+
+val Step = Color(0xFF64FFB2)

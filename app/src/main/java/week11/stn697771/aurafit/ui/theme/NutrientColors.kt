@@ -21,6 +21,8 @@ data class NutrientColors(
     val calLight: Color,
     val calLightest: Color,
 
+    val step: Color,
+
     val emptyProgress: Color,
     val disabled: Color,
 )
@@ -31,6 +33,6 @@ val LocalNutrientColors = staticCompositionLocalOf {
         Carb, CarbLight, CarbLightest,
         Fat, FatLight, FatLightest,
         Cal, CalLight, CalLightest,
-        EmptyProgress, Disabled
+        Step, EmptyProgress, Disabled
     )
 }
