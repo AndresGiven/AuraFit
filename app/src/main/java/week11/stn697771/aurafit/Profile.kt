@@ -21,6 +21,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -68,18 +69,17 @@ fun Profile(vm: MainViewModel) {
 
     val colors = LocalNutrientColors.current
 
-
-
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
     ) {
+
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        ){
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -105,6 +105,7 @@ fun Profile(vm: MainViewModel) {
             Surface(
                 color = MaterialTheme.colorScheme.primary,
                 shape = RoundedCornerShape(30.dp),
+                tonalElevation = 6.dp,
                 modifier = Modifier.fillMaxWidth()
             ) {
 
@@ -151,7 +152,6 @@ fun Profile(vm: MainViewModel) {
                         Text(
                             "Steps",
                             color = Color.White,
-                            fontSize = 18.sp,
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.weight(1f)
                         )
@@ -163,7 +163,6 @@ fun Profile(vm: MainViewModel) {
                             Icon(Icons.Default.Edit, contentDescription = null, tint = Color.White)
                         }
                     }
-                    Spacer(modifier = Modifier.height(1.dp))
 
                     HorizontalDivider(
                         modifier = Modifier
@@ -396,9 +395,10 @@ fun Profile(vm: MainViewModel) {
                         )
                     }
 
-                    InfoRow("Age", "28")
-                    InfoRow("Height", "181cm")
-                    InfoRow("Weight", "91kg")
+                    PersonalInfoRow("Age", vm.age.value) { vm.editPersonalInfo("Age", vm.age.value) }
+                    PersonalInfoRow("Height", vm.height.value) { vm.editPersonalInfo("Height", vm.height.value) }
+                    PersonalInfoRow("Weight", vm.weight.value) { vm.editPersonalInfo("Weight", vm.weight.value) }
+
 
                     Spacer(modifier = Modifier.height(20.dp))
                     if (vm.showDialog.value) {
@@ -411,11 +411,38 @@ fun Profile(vm: MainViewModel) {
                             onCancel = { vm.onDialogCancel() }
                         )
                     }
-
+                    Button(onClick = { vm.logout() }) {
+                        Text("Logout")
+                    }
 
 
                 }
             }
+
+        }
+    }
+}
+
+
+@Composable
+fun PersonalInfoRow(label: String, value: String, onEdit: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween // keeps Text and IconButton at ends
+    ) {
+        Text(
+            text = "$label: $value",
+            color = Color.White,
+            style = MaterialTheme.typography.bodyLarge
+        )
+        IconButton(
+            onClick = onEdit,
+            modifier = Modifier.size(32.dp)
+        ) {
+            Icon(Icons.Default.Edit, contentDescription = "Edit $label", tint = Color.White)
         }
     }
 }

@@ -115,6 +115,10 @@ class MainViewModel(application: Application) :
     private val _todayCalories = mutableStateOf(0f)
     val todayCalories: State<Float> = _todayCalories
 
+    val age = mutableStateOf("")
+    val height = mutableStateOf("")
+    val weight = mutableStateOf("")
+
 
     fun startStepTracking() {
         if (isTracking) {
@@ -282,6 +286,9 @@ class MainViewModel(application: Application) :
                         carbsGoal.value = repo.getGoal("carbs")
                         fatsGoal.value = repo.getGoal("fats")
                         caloriesGoal.value = repo.getGoal("calories")
+                        age.value = repo.getUserInfo("age")
+                        height.value = repo.getUserInfo("height")
+                        weight.value = repo.getUserInfo("weight")
                     } catch (e: Exception) {
                         println("Failed to fetch user data: ${e.message}")
                     }
@@ -298,8 +305,30 @@ class MainViewModel(application: Application) :
             carbsGoal.value = repo.getGoal("carbs")
             fatsGoal.value = repo.getGoal("fats")
             caloriesGoal.value = repo.getGoal("calories")
+            age.value = repo.getUserInfo("age")
+            height.value = repo.getUserInfo("height")
+            weight.value = repo.getUserInfo("weight")
         }
     }
+
+    fun editPersonalInfo(fieldName: String, currentValue: String) {
+        dialogTitle.value = fieldName
+        dialogValue.value = currentValue
+        onSaveDialog = { newValue ->
+            when(fieldName) {
+                "Age" -> age.value = newValue
+                "Height" -> height.value = newValue
+                "Weight" -> weight.value = newValue
+            }
+
+            // Save to Firebase
+            viewModelScope.launch {
+                repo.saveUserInfo(fieldName.lowercase(), newValue)
+            }
+        }
+        showDialog.value = true
+    }
+
 
     fun saveStepsToFirebase(currentSteps: Int) {
         viewModelScope.launch {
