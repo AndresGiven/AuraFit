@@ -254,8 +254,26 @@ class MainViewModel(application: Application) :
             } else {
                 _uiState.value = UiState.Authenticated
                 sendEvent(NavEvent.ToPedometer)
+
+                // Fetch new user's goals and steps
+                // This ensures that every time a new user logs in, the ViewModel state
+                // is updated with their personal steps and goals from Firebase.
+                viewModelScope.launch {
+                    try {
+                        _steps.value = repo.getSteps()               // current user's steps
+                        stepsGoal.value = repo.getGoal("steps")
+                        proteinGoal.value = repo.getGoal("protein")
+                        carbsGoal.value = repo.getGoal("carbs")
+                        fatsGoal.value = repo.getGoal("fats")
+                        caloriesGoal.value = repo.getGoal("calories")
+                    } catch (e: Exception) {
+                        println("Failed to fetch user data: ${e.message}")
+                    }
+                }
             }
         }
+
+        // Load initial user data if already logged in (optional)
         viewModelScope.launch {
             val firebaseSteps = repo.getSteps()
             _steps.value = firebaseSteps
@@ -265,7 +283,6 @@ class MainViewModel(application: Application) :
             fatsGoal.value = repo.getGoal("fats")
             caloriesGoal.value = repo.getGoal("calories")
         }
-
     }
 
     fun saveStepsToFirebase(currentSteps: Int) {
