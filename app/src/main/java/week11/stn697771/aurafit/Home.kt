@@ -44,6 +44,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -73,7 +74,7 @@ import java.time.format.TextStyle
 fun Pedometer(vm: MainViewModel) {
     val scrollState = rememberScrollState()
     val steps by vm.steps.collectAsState()
-    val goal = 10000
+    val goal = vm.stepsGoal
 
 
 
@@ -117,9 +118,9 @@ fun Pedometer(vm: MainViewModel) {
         Spacer(modifier = Modifier.height(12.dp))
         TopMeasurementBar()
         Spacer(modifier = Modifier.height(36.dp))
-        CutCircularPedometer(progress = steps.toFloat()/goal, steps = steps, goal = goal)
+        CutCircularPedometer(steps = steps, goal = goal)
         Spacer(modifier = Modifier.height(16.dp))
-        ProgressBars()
+        ProgressBars(vm)
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = { vm.logout() }) {
             Text("Logout")
@@ -194,10 +195,14 @@ fun TopMeasurementBar() {
 @Composable
 fun CutCircularPedometer(
     modifier: Modifier = Modifier,
-    progress: Float,
     steps: Int,
-    goal: Int = 10000
+    goal: MutableState<String>,
 ) {
+    // Convert goal string to Float safely
+    val goalFloat = goal.value.toFloatOrNull() ?: 1f
+    val progress = (steps.toFloat() / goalFloat).coerceIn(0f, 1f)
+
+
     val auraPrimary = MaterialTheme.colorScheme.primary
     val colors = LocalNutrientColors.current
     val gradientColors = listOf(
@@ -241,7 +246,7 @@ fun CutCircularPedometer(
         }
         Canvas(
             modifier = Modifier
-                .size(255.dp) //change this for inner CIRCLE
+                .size(255.dp)
                 .align(Alignment.Center)
         ) {
             drawCircle(
@@ -257,7 +262,7 @@ fun CutCircularPedometer(
                 color = Color.White
             )
             Text(
-                text = "Goal: ${"%,d".format(goal)}",
+                text = "Goal: ${goal.value}", // display actual goal string
                 fontSize = 20.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = MaterialTheme.colorScheme.tertiary
@@ -269,13 +274,13 @@ fun CutCircularPedometer(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom
         ) {
-
             CircularButton {
-                // adding on click code later
+                // handle click
             }
         }
     }
 }
+
 
 @Composable
 fun CircularButton(
@@ -302,7 +307,17 @@ fun CircularButton(
 }
 
 @Composable
-fun ProgressBars() {
+fun ProgressBars(vm: MainViewModel) {
+    val proteinGoalString by vm.proteinGoal
+    val carbsGoalString by vm.carbsGoal
+    val fatsGoalString by vm.fatsGoal
+    val caloriesGoalString by vm.caloriesGoal
+
+    val proteinGoal = proteinGoalString.toFloatOrNull() ?: 1f
+    val carbsGoal = carbsGoalString.toFloatOrNull() ?: 1f
+    val fatsGoal = fatsGoalString.toFloatOrNull() ?: 1f
+    val caloriesGoal = caloriesGoalString.toFloatOrNull() ?: 1f
+
     val colors = LocalNutrientColors.current
     Column(
         modifier = Modifier
@@ -313,10 +328,10 @@ fun ProgressBars() {
         verticalArrangement = Arrangement.spacedBy(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        NutritionProgressItem("Protein", 59f, 90f, "g",colors.protein)
-        NutritionProgressItem("Carbs", 163f, 310f, "g", colors.carb)
-        NutritionProgressItem("Fat", 55f, 70f, "g",colors.fat)
-        NutritionProgressItem("Cals", 1213f, 1800f, "",colors.cal)
+        NutritionProgressItem("Protein", 59f, proteinGoal, "g",colors.protein)
+        NutritionProgressItem("Carbs", 163f, carbsGoal, "g", colors.carb)
+        NutritionProgressItem("Fat", 55f, fatsGoal, "g",colors.fat)
+        NutritionProgressItem("Cals", 1213f, caloriesGoal, "g",colors.cal)
     }
 }
 
