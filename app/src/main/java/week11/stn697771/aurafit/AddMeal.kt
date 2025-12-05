@@ -1,6 +1,7 @@
 package week11.stn697771.aurafit
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,9 +11,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BorderColor
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -22,6 +25,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -35,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter.Companion.tint
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -147,7 +152,11 @@ fun AddMeal(
 fun MacrosDialog(
     textInput: String,
     vm: MainViewModel,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    editProtein: () -> Unit,
+    editCarbs: () -> Unit,
+    editFat: () -> Unit,
+    editCalories: () -> Unit
 ) {
     Dialog(onDismissRequest = onDismiss) {
         Card(
@@ -155,7 +164,7 @@ fun MacrosDialog(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(336.dp)
+                .height(354.dp)
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
 
@@ -179,7 +188,7 @@ fun MacrosDialog(
                     )
                     HorizontalDivider(
                         modifier = Modifier
-                            .padding(start = 24.dp)
+                            .padding(end = 68.dp)
                             .width(85.dp),
                         thickness = 2.dp,
                         color = Color.White,
@@ -199,10 +208,10 @@ fun MacrosDialog(
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 20.sp,
                         )
-                        MacroItem(Macro.Protein, vm)
-                        MacroItem(Macro.Carbs, vm)
-                        MacroItem(Macro.Fat, vm)
-                        MacroItem(Macro.Calories, vm)
+                        MacroItem(Macro.Protein, vm, editProtein, editCarbs, editFat, editCalories)
+                        MacroItem(Macro.Carbs, vm, editProtein, editCarbs, editFat, editCalories)
+                        MacroItem(Macro.Fat, vm, editProtein, editCarbs, editFat, editCalories)
+                        MacroItem(Macro.Calories, vm, editProtein, editCarbs, editFat, editCalories)
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
@@ -242,24 +251,57 @@ fun MacrosDialog(
 }
 
 @Composable
-fun MacroItem(macro: Macro, vm: MainViewModel) {
+fun MacroItem(
+    macro: Macro,
+    vm: MainViewModel,
+    editProtein: () -> Unit = {},
+    editCarbs: () -> Unit = {},
+    editFat: () -> Unit = {},
+    editCalories: () -> Unit = {}
+) {
     val colors = LocalNutrientColors.current
 
     val value = macro.valueProvider(vm) ?: 0.0
-    val color = macro.colorKey(colors)
+    val lineColor = macro.colorKey(colors)
+    val editColor = macro.colorEdit(colors)
 
     Row(
         modifier = Modifier
-            .padding(12.dp, 12.dp, 12.dp)
+            .padding(start = 12.dp, top = 12.dp, end = 12.dp, bottom = 0.dp)
             .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(macro.label, color = Color.White)
 
-        Text(
-            text = if (macro.showUnit) "${value}g" else "$value",
-            color = Color.White
-        )
+        Spacer(modifier = Modifier.weight(1f))
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = if (macro.showUnit) "${value}g" else "$value",
+                color = Color.White
+            )
+
+            Box(
+                modifier = Modifier
+                    .padding(start = 8.dp, bottom = 2.dp)
+                    .size(24.dp)
+                    .clickable {
+                        when (macro) {
+                            Macro.Protein -> editProtein()
+                            Macro.Calories -> editCalories()
+                            Macro.Carbs -> editCarbs()
+                            Macro.Fat -> editFat()
+                        }
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.BorderColor,
+                    contentDescription = "Edit",
+                    tint = editColor
+                )
+            }
+        }
     }
 
     HorizontalDivider(
@@ -267,9 +309,10 @@ fun MacroItem(macro: Macro, vm: MainViewModel) {
             .padding(horizontal = 12.dp)
             .fillMaxWidth(),
         thickness = 3.dp,
-        color = color
+        color = lineColor
     )
 }
+
 
 
 

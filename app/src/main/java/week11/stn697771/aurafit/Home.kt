@@ -377,12 +377,6 @@ fun NutritionProgressItem(
     }
 }
 
-//// Placeholder screens
-@Composable
-fun InsightsScreen(vm: MainViewModel){
-    Text("INSIGHTS SCREEN", color = Color.Black)
-}
-
 @Composable
 fun AddMealScreen(vm: MainViewModel){
     Text("ADD MEAL SCREEN", color = Color.Black)

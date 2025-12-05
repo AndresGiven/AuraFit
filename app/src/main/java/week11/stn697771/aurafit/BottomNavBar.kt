@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import week11.stn697771.aurafit.data.Macro
 import week11.stn697771.aurafit.data.NutritionGuess
 import week11.stn697771.aurafit.util.NavEvent
 import week11.stn697771.aurafit.viewmodel.MainViewModel
@@ -99,74 +100,25 @@ fun BottomNavigationBar(
             1 -> AddMeal(
                 textInput = textInput,
                 onTextChange = { textInput = it },
-                onDismiss = { showDialog = false },
+                onDismiss = {
+                    showDialog = false
+                    textInput = ""
+                },
                 vm = vm,
                 step = { step = 2},
             )
             2 -> MacrosDialog(
                 textInput = textInput,
                 vm,
-                onDismiss = { showDialog = false },
+                onDismiss = {
+                    showDialog = false
+                    textInput = ""
+                },
+                editProtein = { step = 3 },
+                editCarbs = { step = 4 },
+                editFat = { step = 5 },
+                editCalories = { step = 6 },
             )
         }
-    }
-}
-
-
-
-@Composable
-fun BottomNavBar(){
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp)
-            .padding(vertical = 4.dp)
-            .clip(RoundedCornerShape(50.dp))
-            .background(MaterialTheme.colorScheme.primary),
-        horizontalArrangement = Arrangement.SpaceEvenly
-
-    ) {
-        BottomNavButton(
-            icon = Icons.Default.Home,
-            contentDescription = "Home",
-            onClick = { }
-        )
-
-        BottomNavButton(
-            icon = Icons.AutoMirrored.Filled.ShowChart,
-            contentDescription = "Graph",
-            onClick = { }
-        )
-
-        BottomNavButton(
-            icon = Icons.Default.Add,
-            contentDescription = "Add button",
-            onClick = {  }
-        )
-        BottomNavButton(
-            icon = Icons.Default.AccountCircle,
-            contentDescription = "Account Icon",
-            onClick = {  }
-        )
-    }
-}
-
-@Composable
-fun BottomNavButton(
-    icon: ImageVector,
-    contentDescription: String? = null,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    IconButton(
-        onClick = onClick,
-        modifier = modifier
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = contentDescription,
-            tint = Color.White,
-            modifier = Modifier.size(32.dp)
-        )
     }
 }

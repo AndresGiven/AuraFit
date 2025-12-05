@@ -45,12 +45,14 @@ sealed class Macro(
     val label: String,
     val showUnit: Boolean,
     val colorKey: (NutrientColors) -> Color,
+    val colorEdit: (NutrientColors) -> Color,
     val valueProvider: (MainViewModel) -> Double?
 ) {
     object Protein : Macro(
         label = "Protein",
         showUnit = true,
         colorKey = { it.proteinLight },
+        colorEdit = { it.proteinLightest },
         valueProvider = { it.nutrition.value?.protein?.value }
     )
 
@@ -58,6 +60,7 @@ sealed class Macro(
         label = "Fat",
         showUnit = true,
         colorKey = { it.fatLight },
+        colorEdit = { it.fatLightest },
         valueProvider = { it.nutrition.value?.fat?.value }
     )
 
@@ -65,6 +68,7 @@ sealed class Macro(
         label = "Carbs",
         showUnit = true,
         colorKey = { it.carbLight },
+        colorEdit = { it.carbLightest },
         valueProvider = { it.nutrition.value?.carbs?.value }
     )
 
@@ -72,6 +76,7 @@ sealed class Macro(
         label = "Calories",
         showUnit = false,
         colorKey = { it.calLight },
+        colorEdit = { it.calLightest },
         valueProvider = { it.nutrition.value?.calories?.value }
     )
 }

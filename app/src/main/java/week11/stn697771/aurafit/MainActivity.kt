@@ -30,6 +30,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import week11.stn697771.aurafit.viewmodel.Insights
 
 class MainActivity : ComponentActivity() {
 
@@ -140,7 +141,7 @@ class MainActivity : ComponentActivity() {
                         composable("signup") { SignUpScreen(vm) }
                         composable("forgot") { PasswordScreen(vm) }
                         composable("pedometer") { Pedometer(vm) }
-                        composable("insights") { InsightsScreen(vm) }
+                        composable("insights") { Insights(vm) }
                         composable("addMeal") { AddMealScreen(vm) }
                         composable("profile") { Profile(vm) }
                     }

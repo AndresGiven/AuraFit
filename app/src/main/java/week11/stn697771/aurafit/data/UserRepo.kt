@@ -1,11 +1,15 @@
 package week11.stn697771.aurafit.data
 
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import week11.stn697771.aurafit.model.Meal
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.Date
 import java.util.Locale
 
@@ -103,6 +107,22 @@ class UserRepo {
 
 
 
+    suspend fun getStepsForDay(dateId: String): Float? {
+        Log.d("MyLog", "Getting steps for date: $dateId")
+        val user = auth.currentUser ?: return null
+        return try {
+            val snap = db.collection("users")
+                .document(user.uid)
+                .collection("pedometer")
+                .document(dateId)
+                .get()
+                .await()
 
+            snap.getLong("steps")?.toFloat()
+
+        } catch (e: Exception) {
+            null
+        }
+    }
 }
 
