@@ -151,7 +151,7 @@ fun TopMeasurementBar(vm: MainViewModel) {
                 tint = Color.White
             )
             Text(
-                text = "$calories kcal",
+                text = String.format("%.2f kcal", calories),
                 fontSize = 16.sp,
                 color = Color.White
             )
@@ -251,16 +251,16 @@ fun CutCircularPedometer(
                 color = MaterialTheme.colorScheme.tertiary
             )
         }
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomCenter),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Bottom
-        ) {
-            CircularButton {
-                // handle click
-            }
-        }
+//        Column(
+//            modifier = Modifier
+//                .align(Alignment.BottomCenter),
+//            horizontalAlignment = Alignment.CenterHorizontally,
+//            verticalArrangement = Arrangement.Bottom
+//        ) {
+//            //CircularButton {
+//                // handle click
+//            }
+//      }
     }
 }
 
