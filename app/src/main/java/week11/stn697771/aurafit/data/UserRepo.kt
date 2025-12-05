@@ -124,5 +124,38 @@ class UserRepo {
             null
         }
     }
+
+    suspend fun saveUserInfo(field: String, value: String) {
+        val user = FirebaseAuth.getInstance().currentUser ?: return
+
+        val data = mapOf(
+            "value" to value
+        )
+
+        db.collection("users")
+            .document(user.uid)
+            .collection("personal_info")
+            .document(field)
+            .set(data)
+            .await()
+    }
+
+
+    suspend fun getUserInfo(field: String): String {
+        val user = FirebaseAuth.getInstance().currentUser ?: return "0" // default if no user
+
+        return try {
+            val docSnapshot = db.collection("users")
+                .document(user.uid)
+                .collection("personal_info")
+                .document(field)
+                .get()
+                .await()
+            docSnapshot.getString("value") ?: "0"  // default if empty
+        } catch (e: Exception) {
+            "0"
+        }
+    }
+
 }
 
